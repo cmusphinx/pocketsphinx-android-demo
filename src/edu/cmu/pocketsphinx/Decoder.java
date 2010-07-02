@@ -65,7 +65,11 @@ public class Decoder {
   }
 
   public int processRaw(short[] SDATA, boolean no_search, boolean full_utt) {
-    return pocketsphinxJNI.Decoder_processRaw(swigCPtr, this, SDATA, no_search, full_utt);
+    return pocketsphinxJNI.Decoder_processRaw__SWIG_0(swigCPtr, this, SDATA, no_search, full_utt);
+  }
+
+  public int processRaw(short[] shorts, long nshorts, boolean no_search, boolean full_utt) {
+    return pocketsphinxJNI.Decoder_processRaw__SWIG_1(swigCPtr, this, shorts, nshorts, no_search, full_utt);
   }
 
   public Hypothesis getHyp() {

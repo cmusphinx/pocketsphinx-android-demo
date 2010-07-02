@@ -40,7 +40,8 @@ class pocketsphinxJNI {
   public final static native int Decoder_startUtt__SWIG_1(long jarg1, Decoder jarg1_, String jarg2);
   public final static native String Decoder_getUttid(long jarg1, Decoder jarg1_);
   public final static native int Decoder_endUtt(long jarg1, Decoder jarg1_);
-  public final static native int Decoder_processRaw(long jarg1, Decoder jarg1_, short[] jarg2, boolean jarg4, boolean jarg5);
+  public final static native int Decoder_processRaw__SWIG_0(long jarg1, Decoder jarg1_, short[] jarg2, boolean jarg4, boolean jarg5);
+  public final static native int Decoder_processRaw__SWIG_1(long jarg1, Decoder jarg1_, short[] jarg2, long jarg3, boolean jarg4, boolean jarg5);
   public final static native long Decoder_getHyp(long jarg1, Decoder jarg1_);
   public final static native void delete_Decoder(long jarg1);
   public final static native void setLogfile(String jarg1);

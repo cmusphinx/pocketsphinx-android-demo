@@ -8,9 +8,9 @@
 	android:text="Text goes here..." android:contentDescription="Recognition results"
 	android:layout_height="wrap_content" android:layout_weight="1"></EditText>
 
-<edu.cmu.pocketsphinx.demo.HoldButton android:id="@+id/Button01" android:layout_width="wrap_content"
+<Button android:id="@+id/Button01" android:layout_width="wrap_content"
 	android:layout_height="wrap_content" android:layout_weight="0"
 	android:layout_gravity="center_horizontal" android:text="Hold and Speak">]
-	</edu.cmu.pocketsphinx.demo.HoldButton>
+	</Button>
 
 </LinearLayout>
