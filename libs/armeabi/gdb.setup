@@ -1,0 +1,8 @@
+set solib-search-path /home/dhuggins/workspace/PocketSphinxDemo/bin/ndk/local/armeabi
+directory /home/dhuggins/Projects/Android/android-ndk-r4/build/platforms/android-5/arch-arm/usr/include
+directory /home/dhuggins/workspace/PocketSphinxDemo/jni
+directory /home/dhuggins/workspace/PocketSphinxDemo/jni
+directory /home/dhuggins/workspace/PocketSphinxDemo/jni
+directory /home/dhuggins/workspace/PocketSphinxDemo/jni
+directory /home/dhuggins/workspace/PocketSphinxDemo/jni
+directory /home/dhuggins/workspace/PocketSphinxDemo/jni
