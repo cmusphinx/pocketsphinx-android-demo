@@ -15,24 +15,50 @@ import edu.cmu.pocketsphinx.Decoder;
 import edu.cmu.pocketsphinx.Hypothesis;
 import edu.cmu.pocketsphinx.pocketsphinx;
 
+/**
+ * Speech recognition task, which runs in a worker thread.
+ * 
+ * This class implements speech recognition for this demo application.
+ * 
+ * @author dhuggins
+ */
 class RecognizerTask implements Runnable {
+	/**
+	 * PocketSphinx native decoder object.
+	 */
 	Decoder ps;
+	/**
+	 * Audio input object.
+	 */
 	AudioRecord rec;
+	/**
+	 * Flag which indicates whether recording/recognition is currently underway.
+	 */
 	Boolean recording;
-	
+
 	public RecognizerTask() {
 		this.createDecoder();
 		this.createAudio();
 		this.recording = false;
 	}
 
+	/**
+	 * Initialize the speech recognizer.
+	 */
 	void createDecoder() {
-        pocketsphinx.setLogfile("/sdcard/Android/data/edu.cmu.pocketsphinx/pocketsphinx.log");
+		pocketsphinx
+				.setLogfile("/sdcard/Android/data/edu.cmu.pocketsphinx/pocketsphinx.log");
 		Config c = new Config();
-		/* In 2.2 and above we can use getExternalFilesDir() or whatever it's called */
-		c.setString("-hmm", "/sdcard/Android/data/edu.cmu.pocketsphinx/hmm/en_US/hub4wsj_sc_8k");
-		c.setString("-dict", "/sdcard/Android/data/edu.cmu.pocketsphinx/lm/en_US/hub4.5000.dic");
-		c.setString("-lm", "/sdcard/Android/data/edu.cmu.pocketsphinx/lm/en_US/hub4.5000.DMP");
+		/*
+		 * In 2.2 and above we can use getExternalFilesDir() or whatever it's
+		 * called
+		 */
+		c.setString("-hmm",
+				"/sdcard/Android/data/edu.cmu.pocketsphinx/hmm/en_US/hub4wsj_sc_8k");
+		c.setString("-dict",
+				"/sdcard/Android/data/edu.cmu.pocketsphinx/lm/en_US/hub4.5000.dic");
+		c.setString("-lm",
+				"/sdcard/Android/data/edu.cmu.pocketsphinx/lm/en_US/hub4.5000.DMP");
 		c.setString("-rawlogdir", "/sdcard/Android/data/edu.cmu.pocketsphinx");
 		c.setInt("-samprate", 8000);
 		c.setInt("-pl_window", 2);
@@ -40,25 +66,27 @@ class RecognizerTask implements Runnable {
 		c.setBoolean("-bestpath", false);
 		this.ps = new Decoder(c);
 	}
-	
+
+	/**
+	 * Initialize audio recording.
+	 */
 	void createAudio() {
-		this.rec = new AudioRecord(MediaRecorder.AudioSource.DEFAULT,
-					8000, AudioFormat.CHANNEL_IN_MONO,AudioFormat.ENCODING_PCM_16BIT,
-					32768);
+		this.rec = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, 8000,
+				AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT,
+				32768);
 	}
 
-	@Override
 	public void run() {
 		while (true) {
 			try {
-				synchronized(this.recording) {
+				synchronized (this.recording) {
 					this.recording.wait();
 				}
-				Log.d(getClass().getName(), (this.recording ? "" : "not ") + "recording!");
+				Log.d(getClass().getName(), (this.recording ? "" : "not ")
+						+ "recording!");
 				if (!this.recording)
 					continue;
-			}
-			catch (InterruptedException e) {
+			} catch (InterruptedException e) {
 				Log.d(getClass().getName(), "interrupted!");
 				continue;
 			}
@@ -85,15 +113,15 @@ class RecognizerTask implements Runnable {
 			Log.d(getClass().getName(), "hyp: " + hyp.getHypstr());
 		}
 	}
-	
+
 	public void start() {
 		Log.d(getClass().getName(), "start");
-		synchronized(this.recording) {
+		synchronized (this.recording) {
 			this.recording.notifyAll();
 			this.recording = true;
 		}
 	}
-	
+
 	public void stop() {
 		Log.d(getClass().getName(), "stop");
 		this.recording = false;
@@ -104,10 +132,27 @@ public class PocketSphinxDemo extends Activity implements OnTouchListener {
 	static {
 		System.loadLibrary("pocketsphinx_jni");
 	}
+	/**
+	 * Recognizer task, which runs in a worker thread.
+	 */
 	RecognizerTask rec;
+	/**
+	 * Worker thread in which the recognizer task runs.
+	 */
 	Thread rec_thread;
-	
-	@Override
+
+	/**
+	 * Respond to touch events on the Speak button.
+	 * 
+	 * This allows the Speak button to function as a "push and hold" button, by
+	 * triggering the start of recognition when it is first pushed, and the end
+	 * of recognition when it is released.
+	 * 
+	 * @param v
+	 *            View on which this event is called
+	 * @param event
+	 *            Event that was triggered.
+	 */
 	public boolean onTouch(View v, MotionEvent event) {
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
@@ -122,15 +167,16 @@ public class PocketSphinxDemo extends Activity implements OnTouchListener {
 		/* Let the button handle its own state */
 		return false;
 	}
+
 	/** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-        this.rec = new RecognizerTask();
-        this.rec_thread = new Thread(this.rec);
-        Button b = (Button) findViewById(R.id.Button01);
-        b.setOnTouchListener(this);
-        this.rec_thread.start();
-    }
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
+		this.rec = new RecognizerTask();
+		this.rec_thread = new Thread(this.rec);
+		Button b = (Button) findViewById(R.id.Button01);
+		b.setOnTouchListener(this);
+		this.rec_thread.start();
+	}
 }

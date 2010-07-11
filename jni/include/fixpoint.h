@@ -80,10 +80,15 @@ typedef int32 fixed32;
  */
 
 
-/* Actually this is StrongARM-specific and not armv6-compatible.  
- * Skip out iPhone targets by skipping __APPLE__ builds. 
+/* 
+ * This works on most modern ARMs but *only* in ARM mode (for obvious
+ * reasons), so don't use it in Thumb mode (but why are you building
+ * signal processing code in Thumb mode?!)
+ *
+ * Explicitly skip out iPhone targets by skipping __APPLE__ builds
+ * (not sure if this is redundant with the Thumb check)
  */
-#if defined(__arm__) && !defined(__APPLE__)
+#if defined(__arm__) && !defined(__APPLE__) && !defined(__thumb__)
 #define FIXMUL(a,b) FIXMUL_ANY(a,b,DEFAULT_RADIX)
 #define FIXMUL_ANY(a,b,r) ({				\
       int cl, ch, _a = a, _b = b;			\

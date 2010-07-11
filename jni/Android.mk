@@ -28,7 +28,7 @@ LOCAL_SRC_FILES := \
 	huff_code.c \
 	info.c \
 	listelem_alloc.c \
-	logmath.c \
+	logmath.c.arm \
 	matrix.c \
 	mmio.c \
 	pio.c \
@@ -46,6 +46,7 @@ LOCAL_CFLAGS += -DANDROID_NDK
 
 LOCAL_PATH := $(BASE_PATH)/sphinxbase/src/libsphinxbase/fe
 LOCAL_MODULE := sphinxfe
+LOCAL_ARM_MODE := arm
 
 LOCAL_SRC_FILES := \
 	fe_interface.c \
@@ -53,7 +54,8 @@ LOCAL_SRC_FILES := \
 	fe_warp_affine.c \
 	fe_warp.c \
 	fe_warp_inverse_linear.c \
-	fe_warp_piecewise_linear.c
+	fe_warp_piecewise_linear.c \
+	fixlog.c
 
 include $(BUILD_STATIC_LIBRARY)
 
@@ -112,11 +114,11 @@ LOCAL_SRC_FILES := \
 	fsg_history.c   \
 	fsg_lextree.c   \
 	fsg_search.c   \
-	hmm.c     \
+	hmm.c.arm     \
 	mdef.c     \
-	ms_gauden.c    \
-	ms_mgau.c    \
-	ms_senone.c    \
+	ms_gauden.c.arm    \
+	ms_mgau.c.arm    \
+	ms_senone.c.arm    \
 	ngram_search.c   \
 	ngram_search_fwdtree.c \
 	ngram_search_fwdflat.c \
@@ -124,8 +126,8 @@ LOCAL_SRC_FILES := \
 	pocketsphinx.c \
 	ps_lattice.c   \
 	ps_mllr.c    \
-	ptm_mgau.c    \
-	s2_semi_mgau.c   \
+	ptm_mgau.c.arm    \
+	s2_semi_mgau.c.arm   \
 	tmat.c     \
 	vector.c
 

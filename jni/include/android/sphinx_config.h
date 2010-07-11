@@ -32,7 +32,7 @@
 /* #undef FIXED16 */
 
 /* Use fixed-point computation */
-/* #undef FIXED_POINT */
+#define FIXED_POINT
 
 /* The size of `long', as computed by sizeof. */
 #define SIZEOF_LONG 8
