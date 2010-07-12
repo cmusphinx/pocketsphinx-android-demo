@@ -2,7 +2,7 @@
 %include <arrays_java.i>
 %{
 #include <pocketsphinx.h>
-#include <err.h>
+#include <sphinxbase/err.h>
 
 /* Typedefs to make Java-esque class names. */
 typedef struct cmd_ln_s Config;
