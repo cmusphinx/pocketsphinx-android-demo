@@ -70,3 +70,4 @@ bin/ndk/local/armeabi/objs/sphinxutil/strfuncs.o.d
 bin/ndk/local/armeabi/objs/sphinxutil/utf8.o.d
 bin
 gen
+jni/edu/cmu/pocketsphinx/*.java

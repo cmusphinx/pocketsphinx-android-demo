@@ -51,7 +51,7 @@ typedef struct ps_lattice_s {
 typedef struct ps_decoder_s {
 } Decoder;
 
-
+/* Hypothesis class. */
 %extend Hypothesis {
 	Hypothesis(char const *hypstr, char const *uttid, int best_score) {
 		Hypothesis *h = ckd_calloc(1, sizeof(*h));
