@@ -60,8 +60,9 @@ class RecognizerTask implements Runnable {
 		c.setString("-lm",
 				"/sdcard/Android/data/edu.cmu.pocketsphinx/lm/en_US/hub4.5000.DMP");
 		c.setString("-rawlogdir", "/sdcard/Android/data/edu.cmu.pocketsphinx");
-		c.setInt("-samprate", 8000);
-		c.setInt("-pl_window", 2);
+		c.setFloat("-samprate", 8000.0);
+		c.setInt("-maxhmmpf", 2000);
+		c.setInt("-maxwpf", 10);
 		c.setBoolean("-backtrace", true);
 		c.setBoolean("-bestpath", false);
 		this.ps = new Decoder(c);
@@ -73,7 +74,7 @@ class RecognizerTask implements Runnable {
 	void createAudio() {
 		this.rec = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, 8000,
 				AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT,
-				32768);
+				16384);
 	}
 
 	public void run() {
