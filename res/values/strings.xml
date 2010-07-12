@@ -3,4 +3,5 @@
     <string name="hello">Hello World, PocketSphinxDemo!</string>
     <string name="app_name">PocketSphinx Demo</string>
 <color name="white">#FFF</color>
+<string name="performance_text">0.00 seconds 0.00 xRT</string>
 </resources>

@@ -8,9 +8,11 @@
 	android:text="Text goes here..." android:contentDescription="Recognition results"
 	android:layout_height="wrap_content" android:layout_weight="1"></EditText>
 
-<Button android:id="@+id/Button01" android:layout_width="wrap_content"
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/PerformanceText" android:text="@string/performance_text" android:layout_gravity="center_horizontal"></TextView><Button android:id="@+id/Button01" android:layout_width="wrap_content"
 	android:layout_height="wrap_content" android:layout_weight="0"
 	android:layout_gravity="center_horizontal" android:text="Hold and Speak">]
 	</Button>
+
+
 
 </LinearLayout>
