@@ -1,6 +1,11 @@
-# Create the static pocketsphinx implementation
+# Build the native component of the PocketSphinx library for Android.
 
+# You MUST change this to the absolute path of the directory containing
+# sphinxbase and pocketsphinx source code.
 SPHINX_PATH := $(HOME)/Projects/Sphinx/trunk
+
+# Copy this Android.mk along with pocketsphinx_wrap.c and the contents of the 'edu' folder
+# built by swig to the jni/ directory of your Android project.
 BASE_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
