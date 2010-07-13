@@ -334,7 +334,7 @@ public class RecognizerTask implements Runnable {
 		}
 	}
 
-	public void stop() throws InterruptedException {
+	public void stop() {
 		Log.d(getClass().getName(), "signalling STOP");
 		synchronized (this.mailbox) {
 			this.mailbox.notifyAll();
@@ -343,7 +343,7 @@ public class RecognizerTask implements Runnable {
 		}
 	}
 
-	public void shutdown() throws InterruptedException {
+	public void shutdown() {
 		Log.d(getClass().getName(), "signalling SHUTDOWN");
 		synchronized (this.mailbox) {
 			this.mailbox.notifyAll();

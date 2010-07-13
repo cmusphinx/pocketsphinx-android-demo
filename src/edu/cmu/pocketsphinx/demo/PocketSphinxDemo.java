@@ -64,21 +64,12 @@ public class PocketSphinxDemo extends Activity implements OnTouchListener, Recog
 			this.rec.start();
 			break;
 		case MotionEvent.ACTION_UP:
-			try {
-				Date end_date = new Date();
-				long nmsec = end_date.getTime() - start_date.getTime();
-				this.speech_dur = (float)nmsec / 1000;
-				this.rec_dialog = ProgressDialog.show(PocketSphinxDemo.this, "", "Recognizing speech...", true);
-				this.rec_dialog.setCancelable(false);
-				this.rec.stop();
-			} catch (InterruptedException e) {
-				/*
-				 * FIXME: This just leaves the button in down state, not sure
-				 * what exactly to do in this case. Perhaps we should try again
-				 * later?
-				 */
-				return true;
-			}
+			Date end_date = new Date();
+			long nmsec = end_date.getTime() - start_date.getTime();
+			this.speech_dur = (float)nmsec / 1000;
+			this.rec_dialog = ProgressDialog.show(PocketSphinxDemo.this, "", "Recognizing speech...", true);
+			this.rec_dialog.setCancelable(false);
+			this.rec.stop();
 			break;
 		default:
 			;
