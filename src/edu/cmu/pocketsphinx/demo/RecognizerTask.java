@@ -174,8 +174,19 @@ public class RecognizerTask implements Runnable {
 				"/sdcard/Android/data/edu.cmu.pocketsphinx/lm/en_US/hub4.5000.dic");
 		c.setString("-lm",
 				"/sdcard/Android/data/edu.cmu.pocketsphinx/lm/en_US/hub4.5000.DMP");
+		/*
+		c.setString("-hmm",
+		"/sdcard/Android/data/edu.cmu.pocketsphinx/hmm/zh/tdt_sc_8k");
+		c.setString("-dict",
+		"/sdcard/Android/data/edu.cmu.pocketsphinx/lm/zh_TW/mandarin_notone.dic");
+		c.setString("-lm",
+		"/sdcard/Android/data/edu.cmu.pocketsphinx/lm/zh_TW/gigatdt.5000.DMP");
+		*/
 		c.setString("-rawlogdir", "/sdcard/Android/data/edu.cmu.pocketsphinx");
 		c.setFloat("-samprate", 8000.0);
+		c.setInt("-maxhmmpf", 2000);
+		c.setInt("-maxwpf", 10);
+		c.setInt("-pl_window", 2);
 		c.setBoolean("-backtrace", true);
 		c.setBoolean("-bestpath", false);
 		this.ps = new Decoder(c);
@@ -224,7 +235,7 @@ public class RecognizerTask implements Runnable {
 			case START:
 				if (state == State.IDLE) { 
 					Log.d(getClass().getName(), "START");
-					this.audio = new AudioTask(this.audioq);
+					this.audio = new AudioTask(this.audioq, 1024);
 					this.audio_thread = new Thread(this.audio);
 					this.ps.startUtt();
 					this.audio_thread.start();
