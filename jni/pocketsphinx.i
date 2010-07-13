@@ -157,7 +157,10 @@ typedef struct ps_decoder_s {
 		char const *hyp, *uttid;
 		int32 best_score;
 		hyp = ps_get_hyp($self, &best_score, &uttid);
-		return new_Hypothesis(hyp, uttid, best_score);
+		if (hyp == NULL)
+			return NULL;
+		else
+			return new_Hypothesis(hyp, uttid, best_score);
 	}
 	~Decoder() {
 		ps_free($self);

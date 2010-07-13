@@ -868,7 +868,10 @@ SWIGINTERN Hypothesis *Decoder_getHyp(Decoder *self){
 		char const *hyp, *uttid;
 		int32 best_score;
 		hyp = ps_get_hyp(self, &best_score, &uttid);
-		return new_Hypothesis(hyp, uttid, best_score);
+		if (hyp == NULL)
+			return NULL;
+		else
+			return new_Hypothesis(hyp, uttid, best_score);
 	}
 SWIGINTERN void delete_Decoder(Decoder *self){
 		ps_free(self);
