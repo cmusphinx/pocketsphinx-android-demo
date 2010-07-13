@@ -152,6 +152,7 @@ LOCAL_MODULE := pocketsphinx_jni
 
 LOCAL_SRC_FILES := pocketsphinx_wrap.c
 
+# See http://code.google.com/p/android/issues/detail?id=9439
 PRIVATE_WHOLE_STATIC_LIBRARIES := \
 	$(call static-library-path,sphinxutil) \
 	$(call static-library-path,sphinxfe) \
