@@ -332,13 +332,6 @@ public class RecognizerTask implements Runnable {
 	public void start() {
 		Log.d(getClass().getName(), "signalling START");
 		synchronized (this.mailbox) {
-			/*
-			 * Note that after calling this, the lock is still held, so it's
-			 * okay to set the mailbox down there. Android has a mysterious
-			 * feature where calling notify() or notifyAll() in anything other
-			 * than the first statement of a synchronized block results in an
-			 * IllegalMonitorStateException.
-			 */
 			this.mailbox.notifyAll();
 			Log.d(getClass().getName(), "signalled START");
 			this.mailbox = Event.START;
