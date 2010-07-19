@@ -5,6 +5,7 @@ import java.util.Date;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -32,6 +33,10 @@ public class PocketSphinxDemo extends Activity implements OnTouchListener, Recog
 	 * Number of seconds of speech.
 	 */
 	float speech_dur;
+	/**
+	 * Are we listening?
+	 */
+	boolean listening;
 	/**
 	 * Progress dialog for final recognition.
 	 */
@@ -61,14 +66,19 @@ public class PocketSphinxDemo extends Activity implements OnTouchListener, Recog
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 			start_date = new Date();
+			this.listening = true;
 			this.rec.start();
 			break;
 		case MotionEvent.ACTION_UP:
 			Date end_date = new Date();
 			long nmsec = end_date.getTime() - start_date.getTime();
 			this.speech_dur = (float)nmsec / 1000;
-			this.rec_dialog = ProgressDialog.show(PocketSphinxDemo.this, "", "Recognizing speech...", true);
-			this.rec_dialog.setCancelable(false);
+			if (this.listening) {
+				Log.d(getClass().getName(), "Showing Dialog");
+				this.rec_dialog = ProgressDialog.show(PocketSphinxDemo.this, "", "Recognizing speech...", true);
+				this.rec_dialog.setCancelable(false);
+				this.listening = false;
+			}
 			this.rec.stop();
 			break;
 		default:
@@ -85,6 +95,7 @@ public class PocketSphinxDemo extends Activity implements OnTouchListener, Recog
 		setContentView(R.layout.main);
 		this.rec = new RecognizerTask();
 		this.rec_thread = new Thread(this.rec);
+		this.listening = false;
 		Button b = (Button) findViewById(R.id.Button01);
 		b.setOnTouchListener(this);
 		this.performance_text = (TextView) findViewById(R.id.PerformanceText);
@@ -119,7 +130,8 @@ public class PocketSphinxDemo extends Activity implements OnTouchListener, Recog
 				that.performance_text.setText(String.format("%.2f seconds %.2f xRT",
 															that.speech_dur,
 															rec_dur / that.speech_dur));
-				that.rec_dialog.dismiss();				
+				Log.d(getClass().getName(), "Hiding Dialog");
+				that.rec_dialog.dismiss();
 			}
 		});
 	}
