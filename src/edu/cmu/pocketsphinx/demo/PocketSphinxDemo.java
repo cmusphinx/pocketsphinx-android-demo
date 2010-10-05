@@ -89,7 +89,6 @@ public class PocketSphinxDemo extends Activity implements OnTouchListener, Recog
 	}
 
 	/** Called when the activity is first created. */
-	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
@@ -105,7 +104,6 @@ public class PocketSphinxDemo extends Activity implements OnTouchListener, Recog
 	}
 
 	/** Called when partial results are generated. */
-	@Override
 	public void onPartialResults(Bundle b) {
 		final PocketSphinxDemo that = this;
 		final String hyp = b.getString("hyp");
@@ -117,7 +115,6 @@ public class PocketSphinxDemo extends Activity implements OnTouchListener, Recog
 	}
 
 	/** Called with full results are generated. */
-	@Override
 	public void onResults(Bundle b) {
 		final String hyp = b.getString("hyp");
 		final PocketSphinxDemo that = this;
@@ -136,7 +133,6 @@ public class PocketSphinxDemo extends Activity implements OnTouchListener, Recog
 		});
 	}
 
-	@Override
 	public void onError(int err) {
 		final PocketSphinxDemo that = this;
 		that.edit_text.post(new Runnable() {

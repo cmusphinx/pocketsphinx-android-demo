@@ -78,7 +78,6 @@ public class RecognizerTask implements Runnable {
 			this.done = true;
 		}
 
-		@Override
 		public void run() {
 			this.rec.startRecording();
 			while (!this.done) {
@@ -196,7 +195,6 @@ public class RecognizerTask implements Runnable {
 		this.mailbox = Event.NONE;
 	}
 
-	@Override
 	public void run() {
 		/* Main loop for this thread. */
 		boolean done = false;
