@@ -159,6 +159,6 @@ PRIVATE_WHOLE_STATIC_LIBRARIES := \
 	$(call static-library-path,sphinxfeat) \
 	$(call static-library-path,sphinxlm) \
 	$(call static-library-path,pocketsphinx)
-LOCAL_STATIC_LIBRARIES := sphinxutil sphinxfe sphinxfeat sphinxlm pocketsphinx
+LOCAL_STATIC_LIBRARIES := pocketsphinx sphinxlm sphinxfeat sphinxfe sphinxutil
 
 include $(BUILD_SHARED_LIBRARY)
