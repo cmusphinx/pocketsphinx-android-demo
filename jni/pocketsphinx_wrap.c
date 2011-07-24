@@ -776,6 +776,12 @@ typedef struct hyp_s {
 	int best_score;
 } Hypothesis;
 
+/* Nbest iterator */
+typedef struct nbest_s {
+	ps_nbest_t *nbest;
+} Nbest;
+
+
 SWIGINTERN Hypothesis *new_Hypothesis(char const *hypstr,char const *uttid,int best_score){
 		Hypothesis *h = ckd_calloc(1, sizeof(*h));
 		if (hypstr)
@@ -790,6 +796,26 @@ SWIGINTERN void delete_Hypothesis(Hypothesis *self){
 		ckd_free(self->hypstr);
 		ckd_free(self->uttid);
 		ckd_free(self);
+	}
+SWIGINTERN Nbest *new_Nbest(Decoder *d){
+	    Nbest *nbest = ckd_calloc(1, sizeof(*nbest));
+	    nbest->nbest = ps_nbest(d, 0, -1, NULL, NULL);
+	    return nbest;
+	}
+SWIGINTERN void delete_Nbest(Nbest *self){
+	    if (self->nbest)
+	        ps_nbest_free(self->nbest);
+	    ckd_free(self);
+	}
+SWIGINTERN bool Nbest_next(Nbest *self){
+	    self->nbest = ps_nbest_next(self->nbest);
+	    return self->nbest == NULL;
+	}
+SWIGINTERN Hypothesis *Nbest_hyp(Nbest *self){
+	    const char* hyp;
+	    int32 score;
+	    hyp = ps_nbest_hyp(self->nbest, &score);
+	    return new_Hypothesis(hyp, "", score);
 	}
 SWIGINTERN Config *new_Config__SWIG_0(){
 		Config *c = cmd_ln_init(NULL, ps_args(), FALSE, NULL);
@@ -858,7 +884,7 @@ SWIGINTERN char const *Decoder_getUttid(Decoder *self){
 SWIGINTERN int Decoder_endUtt(Decoder *self){
 		return ps_end_utt(self);
 	}
-SWIGINTERN int Decoder_processRaw__SWIG_0(Decoder *self,short const *SDATA,size_t NSAMP,bool no_search,bool full_utt){
+SWIGINTERN int Decoder_processRaw__SWIG_0(Decoder *self,short const const *SDATA,size_t NSAMP,bool no_search,bool full_utt){
 		return ps_process_raw(self, SDATA, NSAMP, no_search, full_utt);
 	}
 SWIGINTERN int Decoder_processRaw__SWIG_1(Decoder *self,short const shorts[],size_t nshorts,bool no_search,bool full_utt){
@@ -868,10 +894,7 @@ SWIGINTERN Hypothesis *Decoder_getHyp(Decoder *self){
 		char const *hyp, *uttid;
 		int32 best_score;
 		hyp = ps_get_hyp(self, &best_score, &uttid);
-		if (hyp == NULL)
-			return NULL;
-		else
-			return new_Hypothesis(hyp, uttid, best_score);
+		return new_Hypothesis(hyp, uttid, best_score);
 	}
 SWIGINTERN void delete_Decoder(Decoder *self){
 		ps_free(self);
@@ -1032,6 +1055,89 @@ SWIGEXPORT void JNICALL Java_edu_cmu_pocketsphinx_pocketsphinxJNI_delete_1Hypoth
   (void)jcls;
   arg1 = *(Hypothesis **)&jarg1; 
   delete_Hypothesis(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_edu_cmu_pocketsphinx_pocketsphinxJNI_Nbest_1nbest_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  Nbest *arg1 = (Nbest *) 0 ;
+  ps_nbest_t *arg2 = (ps_nbest_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(Nbest **)&jarg1; 
+  arg2 = *(ps_nbest_t **)&jarg2; 
+  if (arg1) (arg1)->nbest = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_cmu_pocketsphinx_pocketsphinxJNI_Nbest_1nbest_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  Nbest *arg1 = (Nbest *) 0 ;
+  ps_nbest_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(Nbest **)&jarg1; 
+  result = (ps_nbest_t *) ((arg1)->nbest);
+  *(ps_nbest_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_cmu_pocketsphinx_pocketsphinxJNI_new_1Nbest(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  Decoder *arg1 = (Decoder *) 0 ;
+  Nbest *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(Decoder **)&jarg1; 
+  result = (Nbest *)new_Nbest(arg1);
+  *(Nbest **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_edu_cmu_pocketsphinx_pocketsphinxJNI_delete_1Nbest(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  Nbest *arg1 = (Nbest *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(Nbest **)&jarg1; 
+  delete_Nbest(arg1);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_edu_cmu_pocketsphinx_pocketsphinxJNI_Nbest_1next(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  Nbest *arg1 = (Nbest *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(Nbest **)&jarg1; 
+  result = (bool)Nbest_next(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_edu_cmu_pocketsphinx_pocketsphinxJNI_Nbest_1hyp(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  Nbest *arg1 = (Nbest *) 0 ;
+  Hypothesis *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(Nbest **)&jarg1; 
+  result = (Hypothesis *)Nbest_hyp(arg1);
+  *(Hypothesis **)&jresult = result; 
+  return jresult;
 }
 
 
@@ -1424,7 +1530,7 @@ SWIGEXPORT jint JNICALL Java_edu_cmu_pocketsphinx_pocketsphinxJNI_Decoder_1endUt
 }
 
 
-SWIGEXPORT jint JNICALL Java_edu_cmu_pocketsphinx_pocketsphinxJNI_Decoder_1processRaw_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jshortArray jarg2, jboolean jarg4, jboolean jarg5) {
+SWIGEXPORT jint JNICALL Java_edu_cmu_pocketsphinx_pocketsphinxJNI_Decoder_1processRaw_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jboolean jarg4, jboolean jarg5) {
   jint jresult = 0 ;
   Decoder *arg1 = (Decoder *) 0 ;
   short *arg2 = (short *) 0 ;
@@ -1437,17 +1543,12 @@ SWIGEXPORT jint JNICALL Java_edu_cmu_pocketsphinx_pocketsphinxJNI_Decoder_1proce
   (void)jcls;
   (void)jarg1_;
   arg1 = *(Decoder **)&jarg1; 
-  {
-    arg2 = (short const *) (*jenv)->GetShortArrayElements(jenv, jarg2, NULL);
-    arg3 = (*jenv)->GetArrayLength(jenv, jarg2);
-  }
+  arg2 = *(short **)&jarg2; 
+  arg3 = (size_t)jarg3; 
   arg4 = jarg4 ? true : false; 
   arg5 = jarg5 ? true : false; 
-  result = (int)Decoder_processRaw__SWIG_0(arg1,(short const *)arg2,arg3,arg4,arg5);
+  result = (int)Decoder_processRaw__SWIG_0(arg1,(short const const *)arg2,arg3,arg4,arg5);
   jresult = (jint)result; 
-  {
-    (*jenv)->ReleaseShortArrayElements(jenv, jarg2, arg2, 0);
-  }
   return jresult;
 }
 
