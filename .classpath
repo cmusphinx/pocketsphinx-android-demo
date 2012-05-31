@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="PocketSphinxDemo/libs/armeabi"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="PocketSphinxAndroidDemo/libs/armeabi"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="gen"/>

@@ -13,7 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class PocketSphinxDemo extends Activity implements OnTouchListener, RecognitionListener {
+public class PocketSphinxAndroidDemo extends Activity implements OnTouchListener, RecognitionListener {
 	static {
 		System.loadLibrary("pocketsphinx_jni");
 	}
@@ -75,7 +75,7 @@ public class PocketSphinxDemo extends Activity implements OnTouchListener, Recog
 			this.speech_dur = (float)nmsec / 1000;
 			if (this.listening) {
 				Log.d(getClass().getName(), "Showing Dialog");
-				this.rec_dialog = ProgressDialog.show(PocketSphinxDemo.this, "", "Recognizing speech...", true);
+				this.rec_dialog = ProgressDialog.show(PocketSphinxAndroidDemo.this, "", "Recognizing speech...", true);
 				this.rec_dialog.setCancelable(false);
 				this.listening = false;
 			}
@@ -105,7 +105,7 @@ public class PocketSphinxDemo extends Activity implements OnTouchListener, Recog
 
 	/** Called when partial results are generated. */
 	public void onPartialResults(Bundle b) {
-		final PocketSphinxDemo that = this;
+		final PocketSphinxAndroidDemo that = this;
 		final String hyp = b.getString("hyp");
 		that.edit_text.post(new Runnable() {
 			public void run() {
@@ -117,7 +117,7 @@ public class PocketSphinxDemo extends Activity implements OnTouchListener, Recog
 	/** Called with full results are generated. */
 	public void onResults(Bundle b) {
 		final String hyp = b.getString("hyp");
-		final PocketSphinxDemo that = this;
+		final PocketSphinxAndroidDemo that = this;
 		this.edit_text.post(new Runnable() {
 			public void run() {
 				that.edit_text.setText(hyp);
@@ -134,7 +134,7 @@ public class PocketSphinxDemo extends Activity implements OnTouchListener, Recog
 	}
 
 	public void onError(int err) {
-		final PocketSphinxDemo that = this;
+		final PocketSphinxAndroidDemo that = this;
 		that.edit_text.post(new Runnable() {
 			public void run() {
 				that.rec_dialog.dismiss();
