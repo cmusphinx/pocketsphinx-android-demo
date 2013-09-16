@@ -13,30 +13,38 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class PocketSphinxAndroidDemo extends Activity implements OnTouchListener, RecognitionListener {
+public class PocketSphinxAndroidDemo
+    extends Activity implements OnTouchListener, RecognitionListener {
+
 	static {
 		System.loadLibrary("pocketsphinx_jni");
 	}
+
 	/**
 	 * Recognizer task, which runs in a worker thread.
 	 */
 	RecognizerTask rec;
+
 	/**
 	 * Thread in which the recognizer task runs.
 	 */
 	Thread rec_thread;
+
 	/**
 	 * Time at which current recognition started.
 	 */
 	Date start_date;
+
 	/**
 	 * Number of seconds of speech.
 	 */
 	float speech_dur;
+
 	/**
 	 * Are we listening?
 	 */
 	boolean listening;
+
 	/**
 	 * Progress dialog for final recognition.
 	 */
@@ -44,23 +52,23 @@ public class PocketSphinxAndroidDemo extends Activity implements OnTouchListener
 	/**
 	 * Performance counter view.
 	 */
+
 	TextView performance_text;
 	/**
 	 * Editable text view.
 	 */
+
 	EditText edit_text;
 	
 	/**
 	 * Respond to touch events on the Speak button.
 	 * 
-	 * This allows the Speak button to function as a "push and hold" button, by
-	 * triggering the start of recognition when it is first pushed, and the end
-	 * of recognition when it is released.
+     * This allows the Speak button to function as a "push and hold" button, by
+     * triggering the start of recognition when it is first pushed, and the end
+     * of recognition when it is released.
 	 * 
-	 * @param v
-	 *            View on which this event is called
-	 * @param event
-	 *            Event that was triggered.
+     * @param v     View on which this event is called
+     * @param event Event that was triggered.
 	 */
 	public boolean onTouch(View v, MotionEvent event) {
 		switch (event.getAction()) {

@@ -2,7 +2,7 @@
 
 # You MUST change this to the absolute path of the directory containing
 # sphinxbase and pocketsphinx source code.
-SPHINX_PATH := $(HOME)/Projects/Sphinx/trunk
+SPHINX_PATH := $(HOME)/src.local/sphinx
 
 # Copy this Android.mk along with pocketsphinx_wrap.c and the contents of the 'edu' folder
 # built by swig to the jni/ directory of your Android project.
@@ -55,6 +55,7 @@ LOCAL_MODULE := sphinxfe
 LOCAL_ARM_MODE := arm
 
 LOCAL_SRC_FILES := \
+	fe_noise.c \
 	fe_interface.c \
 	fe_sigproc.c \
 	fe_warp_affine.c \
@@ -150,7 +151,7 @@ LOCAL_CFLAGS += -DANDROID_NDK
 LOCAL_PATH := $(BASE_PATH)
 LOCAL_MODULE := pocketsphinx_jni
 
-LOCAL_SRC_FILES := pocketsphinx_wrap.c
+LOCAL_SRC_FILES := sphinxbase_wrap.c pocketsphinx_wrap.c
 
 # See http://code.google.com/p/android/issues/detail?id=9439
 PRIVATE_WHOLE_STATIC_LIBRARIES := \

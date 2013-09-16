@@ -5,12 +5,17 @@ import java.util.concurrent.LinkedBlockingQueue;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+
 import android.os.Bundle;
+import android.os.Environment;
+
 import android.util.Log;
+
 import edu.cmu.pocketsphinx.Config;
 import edu.cmu.pocketsphinx.Decoder;
 import edu.cmu.pocketsphinx.Hypothesis;
 import edu.cmu.pocketsphinx.pocketsphinx;
+import edu.cmu.pocketsphinx.sphinxbase;
 
 /**
  * Speech recognition task, which runs in a worker thread.
@@ -22,6 +27,12 @@ import edu.cmu.pocketsphinx.pocketsphinx;
  * @author David Huggins-Daines <dhuggins@cs.cmu.edu>
  */
 public class RecognizerTask implements Runnable {
+
+    // TODO: refactor
+    private static final String DATA_PATH =
+        Environment.getExternalStorageDirectory() +
+        "/Android/data/edu.cmu.pocketsphinx/";
+
 	/**
 	 * Audio recording task.
 	 * 
@@ -160,33 +171,19 @@ public class RecognizerTask implements Runnable {
 	}
 
 	public RecognizerTask() {
-		pocketsphinx
-				.setLogfile("/sdcard/Android/data/edu.cmu.pocketsphinx/pocketsphinx.log");
-		Config c = new Config();
-		/*
-		 * In 2.2 and above we can use getExternalFilesDir() or whatever it's
-		 * called
-		 */
-		c.setString("-hmm",
-				"/sdcard/Android/data/edu.cmu.pocketsphinx/hmm/en_US/hub4wsj_sc_8k");
-		c.setString("-dict",
-				"/sdcard/Android/data/edu.cmu.pocketsphinx/lm/en_US/hub4.5000.dic");
-		c.setString("-lm",
-				"/sdcard/Android/data/edu.cmu.pocketsphinx/lm/en_US/hub4.5000.DMP");
-		/*
-		c.setString("-hmm",
-		"/sdcard/Android/data/edu.cmu.pocketsphinx/hmm/zh/tdt_sc_8k");
-		c.setString("-dict",
-		"/sdcard/Android/data/edu.cmu.pocketsphinx/lm/zh_TW/mandarin_notone.dic");
-		c.setString("-lm",
-		"/sdcard/Android/data/edu.cmu.pocketsphinx/lm/zh_TW/gigatdt.5000.DMP");
-		*/
-		c.setString("-rawlogdir", "/sdcard/Android/data/edu.cmu.pocketsphinx");
-		c.setFloat("-samprate", 8000.0);
-		c.setInt("-maxhmmpf", 10000);
-		c.setBoolean("-backtrace", true);
-		c.setBoolean("-bestpath", false);
-		this.ps = new Decoder(c);
+		sphinxbase.setLogFile(DATA_PATH + "pocketsphinx.log");
+
+		Config config = Decoder.defaultConfig();
+		config.setString("-hmm", DATA_PATH + "hmm/hub4wsj_sc_8k");
+		config.setString("-dict", DATA_PATH + "lm/hub4.5000.dic");
+		config.setString("-lm", DATA_PATH + "lm/hub4.5000.DMP");
+		config.setString("-rawlogdir", DATA_PATH);
+		config.setFloat("-samprate", 8000.0);
+		config.setInt("-maxhmmpf", 10000);
+		config.setBoolean("-backtrace", true);
+		config.setBoolean("-bestpath", false);
+
+		this.ps = new Decoder(config);
 		this.audio = null;
 		this.audioq = new LinkedBlockingQueue<short[]>();
 		this.use_partials = false;
@@ -233,7 +230,7 @@ public class RecognizerTask implements Runnable {
 					Log.d(getClass().getName(), "START");
 					this.audio = new AudioTask(this.audioq, 1024);
 					this.audio_thread = new Thread(this.audio);
-					this.ps.startUtt();
+					this.ps.startUtt(null);
 					this.audio_thread.start();
 					state = State.LISTENING;
 				}
@@ -258,12 +255,12 @@ public class RecognizerTask implements Runnable {
 					short[] buf;
 					while ((buf = this.audioq.poll()) != null) {
 						Log.d(getClass().getName(), "Reading " + buf.length + " samples from queue");
-						this.ps.processRaw(buf, buf.length, false, false);
+						this.ps.processRaw(buf, false, false);
 					}
 					this.ps.endUtt();
 					this.audio = null;
 					this.audio_thread = null;
-					Hypothesis hyp = this.ps.getHyp();
+					Hypothesis hyp = this.ps.hyp();
 					if (this.rl != null) {
 						if (hyp == null) {
 							Log.d(getClass().getName(), "Recognition failure");
@@ -304,8 +301,8 @@ public class RecognizerTask implements Runnable {
 				try {
 					short[] buf = this.audioq.take();
 					Log.d(getClass().getName(), "Reading " + buf.length + " samples from queue");
-					this.ps.processRaw(buf, buf.length, false, false);
-					Hypothesis hyp = this.ps.getHyp();
+					this.ps.processRaw(buf, false, false);
+					Hypothesis hyp = this.ps.hyp();
 					if (hyp != null) {
 						String hypstr = hyp.getHypstr();
 						if (hypstr != partial_hyp) {
