@@ -958,8 +958,7 @@ SWIGINTERN Hypothesis *Decoder_hyp(Decoder *self){
         char const *hyp, *uttid;
         int32 best_score;
         hyp = ps_get_hyp(self, &best_score, &uttid);
-
-        return new_Hypothesis(hyp, uttid, best_score);
+        return hyp ? new_Hypothesis(hyp, uttid, best_score) : NULL;
     }
 SWIGINTERN NBest *Decoder_nbest(Decoder *self){
         return new_NBest(ps_nbest(self, 0, -1, NULL, NULL));
@@ -979,10 +978,7 @@ SWIGINTERN NGramModelSet *Decoder_get_lmset(Decoder *self){
     }
 SWIGINTERN NGramModelSet *Decoder_update_lmset(Decoder *self,NGramModelSet *lm_set){
         ngram_model_t *new_lm_set = ps_update_lmset(self, lm_set);
-        if (new_lm_set)
-            return ngram_model_retain(new_lm_set);
-        else
-            return NULL;
+        return new_lm_set ? ngram_model_retain(new_lm_set) : NULL;
     }
 SWIGINTERN FsgSet *Decoder_get_fsgset(Decoder *self){
         return ps_get_fsgset(self);
