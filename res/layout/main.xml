@@ -1,18 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+  android:orientation="vertical"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:background="@color/black">
+
+  <EditText android:id="@+id/EditText01"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" android:background="@color/white">
+    android:text="Text goes here..."
+    android:contentDescription="Recognition results"
+    android:layout_height="wrap_content"
+    android:layout_weight="1" />
 
-<EditText android:id="@+id/EditText01" android:layout_width="fill_parent"
-	android:text="Text goes here..." android:contentDescription="Recognition results"
-	android:layout_height="wrap_content" android:layout_weight="1"></EditText>
+  <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/PerformanceText"
+    android:text="@string/performance_text"
+    android:layout_gravity="center_horizontal" />
 
-<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/PerformanceText" android:text="@string/performance_text" android:layout_gravity="center_horizontal"></TextView><Button android:id="@+id/Button01" android:layout_width="wrap_content"
-	android:layout_height="wrap_content" android:layout_weight="0"
-	android:layout_gravity="center_horizontal" android:text="Hold and Speak">]
-	</Button>
-
-
+  <Button android:id="@+id/Button01"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="0"
+    android:layout_gravity="center_horizontal"
+    android:text="Hold and Speak"/>
 
 </LinearLayout>
