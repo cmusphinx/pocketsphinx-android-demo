@@ -14,7 +14,6 @@ import android.util.Log;
 import edu.cmu.pocketsphinx.Config;
 import edu.cmu.pocketsphinx.Decoder;
 import edu.cmu.pocketsphinx.Hypothesis;
-import edu.cmu.pocketsphinx.pocketsphinx;
 import edu.cmu.pocketsphinx.sphinxbase;
 
 /**
