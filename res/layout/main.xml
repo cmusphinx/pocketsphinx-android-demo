@@ -3,27 +3,18 @@
   android:orientation="vertical"
   android:layout_width="fill_parent"
   android:layout_height="fill_parent"
-  android:background="@color/black">
-
-  <EditText android:id="@+id/EditText01"
-    android:layout_width="fill_parent"
-    android:text="Text goes here..."
-    android:contentDescription="Recognition results"
+  >
+  <ToggleButton
+    android:id="@+id/ToggleRecognition"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_weight="1" />
-
+    android:textOff="Start"
+    android:textOn="Stop"
+    android:onClick="onToggleRecognition" />
   <TextView
-    android:layout_width="wrap_content"
+    android:id="@+id/SpeechResult"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/PerformanceText"
-    android:text="@string/performance_text"
-    android:layout_gravity="center_horizontal" />
-
-  <Button android:id="@+id/Button01"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_weight="0"
-    android:layout_gravity="center_horizontal"
-    android:text="Hold and Speak"/>
-
+    android:text="" />
 </LinearLayout>
+

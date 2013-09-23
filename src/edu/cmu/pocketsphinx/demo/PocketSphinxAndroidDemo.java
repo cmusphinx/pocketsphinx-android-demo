@@ -1,152 +1,104 @@
 package edu.cmu.pocketsphinx.demo;
 
-import java.util.Date;
-
 import android.app.Activity;
-import android.app.ProgressDialog;
+
+import android.media.AudioFormat;
+import android.media.AudioRecord;
+import android.media.MediaRecorder;
+
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.MotionEvent;
+
 import android.view.View;
-import android.view.View.OnTouchListener;
-import android.widget.Button;
-import android.widget.EditText;
+
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
-public class PocketSphinxAndroidDemo
-    extends Activity implements OnTouchListener, RecognitionListener {
+import edu.cmu.pocketsphinx.Config;
+import edu.cmu.pocketsphinx.Decoder;
+import edu.cmu.pocketsphinx.Hypothesis;
 
-	static {
-		System.loadLibrary("pocketsphinx_jni");
-	}
+import static edu.cmu.pocketsphinx.sphinxbase.setLogFile;
 
-	/**
-	 * Recognizer task, which runs in a worker thread.
-	 */
-	RecognizerTask rec;
 
-	/**
-	 * Thread in which the recognizer task runs.
-	 */
-	Thread rec_thread;
+public class PocketSphinxAndroidDemo extends Activity {
 
-	/**
-	 * Time at which current recognition started.
-	 */
-	Date start_date;
+    private class RecognitionTask
+            extends AsyncTask<AudioRecord, Void, Hypothesis> {
 
-	/**
-	 * Number of seconds of speech.
-	 */
-	float speech_dur;
+        private final Decoder decoder;
 
-	/**
-	 * Are we listening?
-	 */
-	boolean listening;
+        public RecognitionTask() {
+            Config config = Decoder.defaultConfig();
+            config.setString("-hmm", DATA_PATH + "hmm/hub4wsj_sc_8k");
+            config.setString("-dict", DATA_PATH + "lm/hub4.5000.dic");
+            config.setString("-lm", DATA_PATH + "lm/hub4.5000.DMP");
+            config.setString("-rawlogdir", DATA_PATH);
+            config.setFloat("-samprate", SAMPLE_RATE);
+            config.setInt("-maxhmmpf", 10000);
+            config.setBoolean("-backtrace", true);
+            config.setBoolean("-bestpath", false);
+            config.setBoolean("-remove_noise", false);
+            decoder = new Decoder(config);
+        }
 
-	/**
-	 * Progress dialog for final recognition.
-	 */
-	ProgressDialog rec_dialog;
-	/**
-	 * Performance counter view.
-	 */
+        protected Hypothesis doInBackground(AudioRecord... recorder) {
+            int nread;
+            short[] buf = new short[1024];
+            decoder.startUtt(null);
 
-	TextView performance_text;
-	/**
-	 * Editable text view.
-	 */
+            while ((nread = recorder[0].read(buf, 0, buf.length)) > 0)
+                decoder.processRaw(buf, nread, false, false);
 
-	EditText edit_text;
-	
-	/**
-	 * Respond to touch events on the Speak button.
-	 * 
-     * This allows the Speak button to function as a "push and hold" button, by
-     * triggering the start of recognition when it is first pushed, and the end
-     * of recognition when it is released.
-	 * 
-     * @param v     View on which this event is called
-     * @param event Event that was triggered.
-	 */
-	public boolean onTouch(View v, MotionEvent event) {
-		switch (event.getAction()) {
-		case MotionEvent.ACTION_DOWN:
-			start_date = new Date();
-			this.listening = true;
-			this.rec.start();
-			break;
-		case MotionEvent.ACTION_UP:
-			Date end_date = new Date();
-			long nmsec = end_date.getTime() - start_date.getTime();
-			this.speech_dur = (float)nmsec / 1000;
-			if (this.listening) {
-				Log.d(getClass().getName(), "Showing Dialog");
-				this.rec_dialog = ProgressDialog.show(PocketSphinxAndroidDemo.this, "", "Recognizing speech...", true);
-				this.rec_dialog.setCancelable(false);
-				this.listening = false;
-			}
-			this.rec.stop();
-			break;
-		default:
-			;
-		}
-		/* Let the button handle its own state */
-		return false;
-	}
+            decoder.endUtt();
+            return decoder.hyp();
+        }
 
-	/** Called when the activity is first created. */
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
-		this.rec = new RecognizerTask();
-		this.rec_thread = new Thread(this.rec);
-		this.listening = false;
-		Button b = (Button) findViewById(R.id.Button01);
-		b.setOnTouchListener(this);
-		this.performance_text = (TextView) findViewById(R.id.PerformanceText);
-		this.edit_text = (EditText) findViewById(R.id.EditText01);
-		this.rec.setRecognitionListener(this);
-		this.rec_thread.start();
-	}
+        protected void onPostExecute(Hypothesis hypothesis) {
+            if (null != hypothesis)
+                speechResult.append("\n" + hypothesis.getHypstr());
+            else
+                throw new IllegalStateException("no hypothesis");
+        }
+    }
 
-	/** Called when partial results are generated. */
-	public void onPartialResults(Bundle b) {
-		final PocketSphinxAndroidDemo that = this;
-		final String hyp = b.getString("hyp");
-		that.edit_text.post(new Runnable() {
-			public void run() {
-				that.edit_text.setText(hyp);
-			}
-		});
-	}
+    private static final String DATA_PATH =
+        "/sdcard/Android/data/edu.cmu.pocketsphinx/";
 
-	/** Called with full results are generated. */
-	public void onResults(Bundle b) {
-		final String hyp = b.getString("hyp");
-		final PocketSphinxAndroidDemo that = this;
-		this.edit_text.post(new Runnable() {
-			public void run() {
-				that.edit_text.setText(hyp);
-				Date end_date = new Date();
-				long nmsec = end_date.getTime() - that.start_date.getTime();
-				float rec_dur = (float)nmsec / 1000;
-				that.performance_text.setText(String.format("%.2f seconds %.2f xRT",
-															that.speech_dur,
-															rec_dur / that.speech_dur));
-				Log.d(getClass().getName(), "Hiding Dialog");
-				that.rec_dialog.dismiss();
-			}
-		});
-	}
+    private static final int SAMPLE_RATE = 8000;
 
-	public void onError(int err) {
-		final PocketSphinxAndroidDemo that = this;
-		that.edit_text.post(new Runnable() {
-			public void run() {
-				that.rec_dialog.dismiss();
-			}
-		});
-	}
+    static {
+        System.loadLibrary("pocketsphinx_jni");
+        setLogFile(DATA_PATH + "pocketsphinx.log");
+    }
+
+    private TextView speechResult;
+    private AudioRecord recorder;
+
+    /**
+     * Called when the activity is first created.
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+
+        speechResult = (TextView) findViewById(R.id.SpeechResult);
+
+        recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_RECOGNITION,
+                                   SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
+                                   AudioFormat.ENCODING_PCM_16BIT, 8192);
+    }
+
+    public void onToggleRecognition(View view) {
+        if (!(view instanceof ToggleButton))
+            return;
+
+        if (((ToggleButton) view).isChecked()) {
+            recorder.startRecording();
+            new RecognitionTask().execute(recorder);
+        } else {
+            recorder.stop();
+        }
+    }
 }
