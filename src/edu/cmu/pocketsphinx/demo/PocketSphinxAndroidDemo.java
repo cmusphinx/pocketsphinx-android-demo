@@ -58,7 +58,7 @@ public class PocketSphinxAndroidDemo extends Activity {
             if (null != hypothesis)
                 speechResult.append("\n" + hypothesis.getHypstr());
             else
-                throw new IllegalStateException("no hypothesis");
+                speechResult.append("\n<no speech>");
         }
     }
 
