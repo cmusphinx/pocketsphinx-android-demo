@@ -41,7 +41,8 @@ public class PocketSphinxAndroidDemo extends Activity {
                 throw new RuntimeException(e);
             }
 
-            setLogFile(new File(root, "pocketsphinx.log").getPath());
+            File rootLog = new File(root.getParentFile(), "pocketsphinx.log");
+            setLogFile(rootLog.getPath());
 
             Config config = Decoder.defaultConfig();
             config.setString("-lm",
