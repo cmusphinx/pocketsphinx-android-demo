@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-public class WeatherForecastFragment extends RecognitionFragment {
+public class WeatherForecastFragment extends ShowcaseFragment {
 
     private TextView resultText;
 
@@ -25,40 +25,17 @@ public class WeatherForecastFragment extends RecognitionFragment {
     }
 
     @Override
-    public void onBeginningOfSpeech() {
+    public void onPartialResult(SpeechResult result) {
+        resultText.setText(result.getBestHypothesis());
     }
 
     @Override
-    public void onBufferReceived(byte[] arg0) {
+    public void onResult(SpeechResult result) {
+        resultText.setText(result.getBestHypothesis());
     }
 
     @Override
-    public void onEndOfSpeech() {
-    }
-
-    @Override
-    public void onError(int arg0) {
-    }
-
-    @Override
-    public void onEvent(int arg0, Bundle arg1) {
-    }
-
-    @Override
-    public void onPartialResults(Bundle bundle) {
-        resultText.setText(bundle.getString("hypothesis"));
-    }
-
-    @Override
-    public void onReadyForSpeech(Bundle arg0) {
-    }
-
-    @Override
-    public void onResults(Bundle bundle) {
-        resultText.setText(bundle.getString("hypothesis"));
-    }
-
-    @Override
-    public void onRmsChanged(float rms) {
+    protected void createRecognizer() {
+        recognizer = SpeechRecognizer.createNGramRecognizer(context);
     }
 }

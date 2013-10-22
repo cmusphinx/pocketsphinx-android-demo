@@ -12,7 +12,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-public class BankAccountFragment extends RecognitionFragment {
+public class BankAccountFragment extends ShowcaseFragment {
+
+    private static final String BALANCE = "balance";
 
     private final static Map<String, String> DIGITS = new HashMap<String, String>();
 
@@ -42,6 +44,7 @@ public class BankAccountFragment extends RecognitionFragment {
     }
 
     private TextView resultText;
+    private ToggleButton startButton;
 
     private float balance;
 
@@ -50,8 +53,8 @@ public class BankAccountFragment extends RecognitionFragment {
         super.onCreate(savedInstanceState);
 
         if (null != savedInstanceState
-                && savedInstanceState.containsKey("balance"))
-            balance = savedInstanceState.getFloat("balance");
+                && savedInstanceState.containsKey(BALANCE))
+            balance = savedInstanceState.getFloat(BALANCE);
     }
 
     @Override
@@ -63,8 +66,8 @@ public class BankAccountFragment extends RecognitionFragment {
         resultText = (TextView) v.findViewById(R.id.result_text);
         setBalance(balance);
 
-        ToggleButton button = (ToggleButton) v.findViewById(R.id.start_button);
-        button.setOnCheckedChangeListener(this);
+        startButton = (ToggleButton) v.findViewById(R.id.start_button);
+        startButton.setOnCheckedChangeListener(this);
 
         return v;
     }
@@ -72,7 +75,7 @@ public class BankAccountFragment extends RecognitionFragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putFloat("balance", balance);
+        outState.putFloat(BALANCE, balance);
     }
 
     private void setBalance(float balance) {
@@ -95,40 +98,13 @@ public class BankAccountFragment extends RecognitionFragment {
     }
 
     @Override
-    public void onBeginningOfSpeech() {
+    public void onPartialResult(SpeechResult result) {
+        resultText.setText(result.getBestHypothesis());
     }
 
     @Override
-    public void onBufferReceived(byte[] buffer) {
-    }
-
-    @Override
-    public void onEndOfSpeech() {
-    }
-
-    @Override
-    public void onError(int error) {
-    }
-
-    @Override
-    public void onEvent(int eventType, Bundle params) {
-    }
-
-    @Override
-    public void onPartialResults(Bundle partialResults) {
-        resultText.setText(partialResults.getString("hypothesis"));
-    }
-
-    @Override
-    public void onReadyForSpeech(Bundle params) {
-    }
-
-    @Override
-    public void onResults(Bundle bundle) {
-        if (!bundle.containsKey("hypothesis"))
-            return;
-
-        String command = bundle.getString("hypothesis");
+    public void onResult(SpeechResult result) {
+        String command = result.getBestHypothesis();
 
         if (command.endsWith("balance"))
             Toast.makeText(context,
@@ -141,6 +117,7 @@ public class BankAccountFragment extends RecognitionFragment {
     }
 
     @Override
-    public void onRmsChanged(float rmsdB) {
+    protected void createRecognizer() {
+        recognizer = SpeechRecognizer.createGrammarRecognizer(context);
     }
 }
