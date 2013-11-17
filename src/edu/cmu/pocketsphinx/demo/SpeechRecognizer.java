@@ -86,7 +86,7 @@ public class SpeechRecognizer {
             File root = modelsDir.getParentFile();
             setLogFile(new File(root, "pocketsphinx.log").getPath());
 
-            config.setString("-lm", joinPath(modelsDir, "lm/weather.lm"));
+            config.setString("-lm", joinPath(modelsDir, "lm/weather.dmp"));
             config.setString("-jsgf", joinPath(modelsDir, "dialog.gram"));
             config.setString("-dict", joinPath(modelsDir, "lm/cmu07a.dic"));
             config.setString("-hmm", joinPath(modelsDir, "hmm/hub4wsj_sc_8k"));
