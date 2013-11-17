@@ -14,9 +14,6 @@ import edu.cmu.pocketsphinx.Hypothesis;
 
 public class BankAccountFragment extends ShowcaseFragment {
 
-    private static final String BALANCE = "balance";
-    private static final String RESULT = "result";
-
     private final static Map<String, String> DIGITS = new HashMap<String, String>();
 
     static {
@@ -49,26 +46,13 @@ public class BankAccountFragment extends ShowcaseFragment {
     private ToggleButton toggleButton;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (null != savedInstanceState
-                && savedInstanceState.containsKey(BALANCE))
-            balance = savedInstanceState.getFloat(BALANCE);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.bank_account, container, false);
         toggleButton = (ToggleButton) v.findViewById(R.id.start_button);
         resultText = (TextView) v.findViewById(R.id.result_text);
-
-        if (null != savedInstanceState)
-            resultText.setText(savedInstanceState.getCharSequence(RESULT));
-        else
-            setBalance(balance);
+        setBalance(balance);
 
         return v;
     }
@@ -79,13 +63,6 @@ public class BankAccountFragment extends ShowcaseFragment {
         toggleButton.setChecked(false);
         toggleButton.setOnCheckedChangeListener(this);
         // TODO: switch to grammar
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putFloat(BALANCE, balance);
-        outState.putCharSequence(RESULT, resultText.getText());
     }
 
     private void setBalance(float balance) {
