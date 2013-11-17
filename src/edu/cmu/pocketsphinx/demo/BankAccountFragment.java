@@ -4,17 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+import edu.cmu.pocketsphinx.Hypothesis;
 
 public class BankAccountFragment extends ShowcaseFragment {
 
     private static final String BALANCE = "balance";
+    private static final String RESULT = "result";
 
     private final static Map<String, String> DIGITS = new HashMap<String, String>();
 
@@ -35,7 +36,6 @@ public class BankAccountFragment extends ShowcaseFragment {
 
     private static float parseAmount(String command) {
         String[] words = command.split("\\s");
-        Log.d("TEST", words.toString());
         String number = "";
         for (int i = 1; i < words.length; ++i)
             number += DIGITS.get(words[i]);
@@ -44,9 +44,9 @@ public class BankAccountFragment extends ShowcaseFragment {
     }
 
     private TextView resultText;
-    private ToggleButton startButton;
 
     private float balance;
+    private ToggleButton toggleButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,20 +62,30 @@ public class BankAccountFragment extends ShowcaseFragment {
                              ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.bank_account, container, false);
-
+        toggleButton = (ToggleButton) v.findViewById(R.id.start_button);
         resultText = (TextView) v.findViewById(R.id.result_text);
-        setBalance(balance);
 
-        startButton = (ToggleButton) v.findViewById(R.id.start_button);
-        startButton.setOnCheckedChangeListener(this);
+        if (null != savedInstanceState)
+            resultText.setText(savedInstanceState.getCharSequence(RESULT));
+        else
+            setBalance(balance);
 
         return v;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        toggleButton.setChecked(false);
+        toggleButton.setOnCheckedChangeListener(this);
+        // TODO: switch to grammar
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putFloat(BALANCE, balance);
+        outState.putCharSequence(RESULT, resultText.getText());
     }
 
     private void setBalance(float balance) {
@@ -85,39 +95,33 @@ public class BankAccountFragment extends ShowcaseFragment {
 
     private void deposit(float amount) {
         setBalance(balance + amount);
-        Toast.makeText(context,
-                       context.getString(R.string.deposit_fmt, amount),
-                       Toast.LENGTH_SHORT).show();
+        notify(R.string.deposit_fmt, amount);
     }
 
     private void withdraw(float amount) {
         setBalance(balance - amount);
-        Toast.makeText(context,
-                       context.getString(R.string.withdraw_fmt, amount),
-                       Toast.LENGTH_SHORT).show();
+        notify(R.string.withdraw_fmt, amount);
     }
 
     @Override
-    public void onPartialResult(SpeechResult result) {
-        resultText.setText(result.getBestHypothesis());
+    public void onPartialResult(Hypothesis hypothesis) {
+        resultText.setText(hypothesis.getHypstr());
     }
 
     @Override
-    public void onResult(SpeechResult result) {
-        String command = result.getBestHypothesis();
+    public void onResult(Hypothesis hypothesis) {
+        String command = hypothesis.getHypstr();
 
         if (command.endsWith("balance"))
-            Toast.makeText(context,
-                           context.getString(R.string.balance_fmt, balance),
-                           Toast.LENGTH_SHORT).show();
+            notify(R.string.balance_fmt, balance);
         else if (command.startsWith("deposit"))
             deposit(parseAmount(command));
         else if (command.startsWith("withdraw"))
             withdraw(parseAmount(command));
     }
 
-    @Override
-    protected void createRecognizer() {
-        recognizer = SpeechRecognizer.createGrammarRecognizer(context);
+    private void notify(int resId, Object... args) {
+        String text = context.getString(resId, args);
+        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
     }
 }

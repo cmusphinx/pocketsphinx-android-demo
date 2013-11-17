@@ -1,5 +1,9 @@
 package edu.cmu.pocketsphinx.demo;
 
+import static edu.cmu.pocketsphinx.SphinxUtil.syncAssets;
+
+import java.io.IOException;
+
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -15,24 +19,34 @@ public abstract class ShowcaseFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
         context = getActivity();
-        createRecognizer();
+
+        try {
+            recognizer = new SpeechRecognizer(syncAssets(context, "models"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        recognizer.addListener(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (recognizer.isActive())
-            recognizer.cancel();
+        recognizer.stopListening();
+        recognizer.removeListener(this);
     }
 
     @Override
     public void onCheckedChanged(CompoundButton button, boolean checked) {
         if (checked)
-            recognizer.startRecognition(this);
+            recognizer.startListening();
         else
-            recognizer.stop();
+            recognizer.stopListening();
     }
-    
-    protected abstract void createRecognizer();
 }

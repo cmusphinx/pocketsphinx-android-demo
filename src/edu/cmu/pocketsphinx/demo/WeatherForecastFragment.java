@@ -6,36 +6,51 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.ToggleButton;
+import edu.cmu.pocketsphinx.Hypothesis;
 
 public class WeatherForecastFragment extends ShowcaseFragment {
 
+    private static final String RESULT = "result";
+
     private TextView resultText;
+
+    private ToggleButton toggleButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.weather_forecast, container, false);
+        toggleButton = (ToggleButton) v.findViewById(R.id.start_button);
         resultText = (TextView) v.findViewById(R.id.result_text);
 
-        ToggleButton b = (ToggleButton) v.findViewById(R.id.start_button);
-        b.setOnCheckedChangeListener(this);
+        if (null != savedInstanceState)
+            resultText.setText(savedInstanceState.getCharSequence(RESULT));
 
         return v;
     }
 
     @Override
-    public void onPartialResult(SpeechResult result) {
-        resultText.setText(result.getBestHypothesis());
+    public void onStart() {
+        super.onStart();
+        toggleButton.setChecked(false);
+        toggleButton.setOnCheckedChangeListener(this);
+        // TODO: switch to LM
     }
 
     @Override
-    public void onResult(SpeechResult result) {
-        resultText.setText(result.getBestHypothesis());
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putCharSequence(RESULT, resultText.getText());
     }
 
     @Override
-    protected void createRecognizer() {
-        recognizer = SpeechRecognizer.createNGramRecognizer(context);
+    public void onPartialResult(Hypothesis hypothesis) {
+        resultText.setText(hypothesis.getHypstr());
+    }
+
+    @Override
+    public void onResult(Hypothesis hypothesis) {
+        resultText.setText(hypothesis.getHypstr());
     }
 }

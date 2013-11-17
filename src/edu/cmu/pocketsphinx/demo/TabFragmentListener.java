@@ -1,59 +1,52 @@
 package edu.cmu.pocketsphinx.demo;
 
-import android.app.ActionBar;
 import android.app.ActionBar.Tab;
+import android.app.ActionBar.TabListener;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 
-public class TabFragmentListener<T extends Fragment> implements
-        ActionBar.TabListener {
-    private final Activity mActivity;
-    private final String mTag;
-    private final Class<T> mClass;
-    private final Bundle mArgs;
-    private Fragment mFragment;
+public class TabFragmentListener<T extends Fragment> implements TabListener {
+    private final Activity activity;
+    private final String tag;
+    private final Class<T> cls;
+    private Fragment fragment;
+    private Bundle state;
 
-    public TabFragmentListener(Activity activity, String tag, Class<T> clz) {
-        this(activity, tag, clz, null);
-    }
+    public TabFragmentListener(Activity a, String t, Class<T> c, Bundle state) {
+        activity = a;
+        tag = t;
+        cls = c;
+        this.state = state;
 
-    public TabFragmentListener(Activity activity, String tag, Class<T> clz,
-            Bundle args) {
-        mActivity = activity;
-        mTag = tag;
-        mClass = clz;
-        mArgs = args;
-
-        // Check to see if we already have a fragment for this tab, probably
-        // from a previously saved state. If so, deactivate it, because our
-        // initial state is that a tab isn't shown.
-        mFragment = mActivity.getFragmentManager().findFragmentByTag(mTag);
-        if (mFragment != null && !mFragment.isDetached()) {
-            FragmentTransaction ft = mActivity.getFragmentManager()
-                    .beginTransaction();
-            ft.detach(mFragment);
+        fragment = activity.getFragmentManager().findFragmentByTag(tag);
+        if (fragment != null && !fragment.isDetached()) {
+            FragmentManager fm = activity.getFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.detach(fragment);
             ft.commit();
         }
     }
 
+    @Override
     public void onTabSelected(Tab tab, FragmentTransaction ft) {
-        if (mFragment == null) {
-            mFragment = Fragment
-                    .instantiate(mActivity, mClass.getName(), mArgs);
-            ft.add(android.R.id.content, mFragment, mTag);
+        if (fragment == null) {
+            fragment = Fragment.instantiate(activity, cls.getName(), state);
+            ft.add(android.R.id.content, fragment, tag);
         } else {
-            ft.attach(mFragment);
+            ft.attach(fragment);
         }
     }
 
+    @Override
     public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-        if (mFragment != null) {
-            ft.detach(mFragment);
-        }
+        if (fragment != null)
+            ft.detach(fragment);
     }
 
+    @Override
     public void onTabReselected(Tab tab, FragmentTransaction ft) {
     }
 }

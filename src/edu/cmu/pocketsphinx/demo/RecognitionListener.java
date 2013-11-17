@@ -1,8 +1,10 @@
 package edu.cmu.pocketsphinx.demo;
 
+import edu.cmu.pocketsphinx.Hypothesis;
+
 public interface RecognitionListener {
 
-    public void onPartialResult(SpeechResult result);
+    public void onPartialResult(Hypothesis hypothesis);
     
-    public void onResult(SpeechResult result);
+    public void onResult(Hypothesis hypothesis);
 }
