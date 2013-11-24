@@ -1,9 +1,5 @@
 package edu.cmu.pocketsphinx.demo;
 
-import static edu.cmu.pocketsphinx.SphinxUtil.syncAssets;
-
-import java.io.IOException;
-
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -21,18 +17,14 @@ public abstract class ShowcaseFragment extends Fragment implements
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         context = getActivity();
-
-        try {
-            recognizer = new SpeechRecognizer(syncAssets(context, "models"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        recognizer = ((PocketSphinxActivity) context).getRecognizer();
         recognizer.addListener(this);
+        recognizer.getDecoder().setSearch(getClass().getSimpleName());
     }
 
     @Override
@@ -40,6 +32,7 @@ public abstract class ShowcaseFragment extends Fragment implements
         super.onStop();
         recognizer.stopListening();
         recognizer.removeListener(this);
+        recognizer = null;
     }
 
     @Override

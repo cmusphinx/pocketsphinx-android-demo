@@ -62,7 +62,6 @@ public class BankAccountFragment extends ShowcaseFragment {
         super.onStart();
         toggleButton.setChecked(false);
         toggleButton.setOnCheckedChangeListener(this);
-        // TODO: switch to grammar
     }
 
     private void setBalance(float balance) {

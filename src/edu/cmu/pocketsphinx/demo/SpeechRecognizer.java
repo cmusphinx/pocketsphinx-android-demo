@@ -1,6 +1,5 @@
 package edu.cmu.pocketsphinx.demo;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.Vector;
 
@@ -23,10 +22,6 @@ public class SpeechRecognizer {
     private static final int MSG_NEXT = 2;
     private static final int MSG_STOP = 3;
 
-    static {
-        System.loadLibrary("pocketsphinx_jni");
-    }
-
     private final AudioRecord recorder;
     private final Decoder decoder;
 
@@ -38,19 +33,7 @@ public class SpeechRecognizer {
 
     private final short[] buffer = new short[1024];
 
-    public SpeechRecognizer(File dataDir) {
-        Config config = Decoder.defaultConfig();
-
-        config.setString("-jsgf", joinPath(dataDir, "dialog.gram"));
-        config.setString("-dict", joinPath(dataDir, "lm/cmu07a.dic"));
-        config.setString("-hmm", joinPath(dataDir, "hmm/hub4wsj_sc_8k"));
-
-        config.setString("-rawlogdir", dataDir.getParent());
-        config.setFloat("-samprate", 8000);
-        config.setInt("-maxhmmpf", 10000);
-        config.setBoolean("-bestpath", false);
-        config.setBoolean("-remove_noise", false);
-
+    public SpeechRecognizer(Config config) {
         decoder = new Decoder(config);
         recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_RECOGNITION,
                                    (int) config.getFloat("-samprate"),
@@ -150,10 +133,6 @@ public class SpeechRecognizer {
         final Hypothesis hypothesis = decoder.hyp();
         if (null != hypothesis)
             mainLoopHandler.post(new ResultCallback(hypothesis));
-    }
-
-    private static String joinPath(File dir, String path) {
-        return new File(dir, path).getPath();
     }
 
     private class ResultCallback implements Runnable {
