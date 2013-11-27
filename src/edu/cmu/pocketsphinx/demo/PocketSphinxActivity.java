@@ -15,6 +15,7 @@ import edu.cmu.pocketsphinx.FsgModel;
 import edu.cmu.pocketsphinx.Jsgf;
 import edu.cmu.pocketsphinx.JsgfRule;
 import edu.cmu.pocketsphinx.NGramModel;
+import edu.cmu.pocketsphinx.SpeechRecognizer;
 import edu.cmu.pocketsphinx.SphinxUtil;
 
 public class PocketSphinxActivity extends Activity {

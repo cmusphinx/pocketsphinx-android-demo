@@ -5,6 +5,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import edu.cmu.pocketsphinx.RecognitionListener;
+import edu.cmu.pocketsphinx.SpeechRecognizer;
 
 public abstract class ShowcaseFragment extends Fragment implements
         OnCheckedChangeListener, RecognitionListener {
