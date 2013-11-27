@@ -34,17 +34,17 @@ public class PocketSphinxActivity extends Activity {
     public void onCreate(Bundle state) {
         super.onCreate(state);
         
-        File dataDir;
+        File appDir;
         try {
-            dataDir = SphinxUtil.syncAssets(getApplicationContext(), "models");
+            appDir = SphinxUtil.syncAssets(getApplicationContext());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         
         Config config = Decoder.defaultConfig();
-        config.setString("-dict", joinPath(dataDir, "lm/cmu07a.dic"));
-        config.setString("-hmm", joinPath(dataDir, "hmm/hub4wsj_sc_8k"));
-        config.setString("-rawlogdir", dataDir.getParent());
+        config.setString("-dict", joinPath(appDir, "models/lm/cmu07a.dic"));
+        config.setString("-hmm", joinPath(appDir, "models/hmm/hub4wsj_sc_8k"));
+        config.setString("-rawlogdir", appDir.getPath());
         config.setFloat("-samprate", 8000);
         config.setInt("-maxhmmpf", 10000);
         config.setBoolean("-bestpath", false);
@@ -52,13 +52,13 @@ public class PocketSphinxActivity extends Activity {
         recognizer = new SpeechRecognizer(config);
         
         Decoder decoder = recognizer.getDecoder();        
-        Jsgf jsgf = new Jsgf(joinPath(dataDir, "dialog.gram"));
+        Jsgf jsgf = new Jsgf(joinPath(appDir, "models/dialog.gram"));
         JsgfRule rule = jsgf.getRule("<dialog.command>");
         int lw = config.getInt("-lw");
         FsgModel fsg = jsgf.buildFsg(rule, decoder.getLogmath(), lw);
         decoder.setFsg(BankAccountFragment.class.getSimpleName(), fsg);
         decoder.setSearch(BankAccountFragment.class.getSimpleName());
-        NGramModel lm = new NGramModel(joinPath(dataDir, "lm/weather.dmp"));
+        NGramModel lm = new NGramModel(joinPath(appDir, "models/lm/weather.dmp"));
         decoder.setLm(WeatherForecastFragment.class.getSimpleName(), lm);
         
         tabBar = getActionBar();
