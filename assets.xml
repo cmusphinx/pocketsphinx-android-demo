@@ -16,7 +16,8 @@
 
   <target name="list">
     <pathconvert
-      property="asset.list" refid="assets" pathsep="${line.separator}">
+      dirsep="/" pathsep="${line.separator}"
+      refid="assets" property="asset.list">
       <map from="${basedir}/${assets.dir}/" to=""/>
     </pathconvert>
     <echo message="${asset.list}" file="${assets.dir}/${assets.list.name}"/>
