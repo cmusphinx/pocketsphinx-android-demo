@@ -81,19 +81,28 @@ public class BankAccountFragment extends ShowcaseFragment {
 
     @Override
     public void onPartialResult(Hypothesis hypothesis) {
+        super.onPartialResult(hypothesis);
+        if (hypothesis.getHypstr().equals(PocketSphinxActivity.KEYPHRASE))
+            return;
         resultText.setText(hypothesis.getHypstr());
     }
 
     @Override
     public void onResult(Hypothesis hypothesis) {
         String command = hypothesis.getHypstr();
-
+        if (command.equals(PocketSphinxActivity.KEYPHRASE))
+            return;
         if (command.endsWith("balance"))
             notify(R.string.balance_fmt, balance);
         else if (command.startsWith("deposit"))
             deposit(parseAmount(command));
         else if (command.startsWith("withdraw"))
             withdraw(parseAmount(command));
+    }
+    
+    @Override
+    protected void setButtonPressed() {
+        toggleButton.setChecked(true);
     }
 
     private void notify(int resId, Object... args) {

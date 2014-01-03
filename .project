@@ -40,4 +40,16 @@
 		<nature>com.android.ide.eclipse.adt.AndroidNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>android-gen</name>
+			<type>2</type>
+			<location>D:/AdvancedKWS/kws_repo/android/gen</location>
+		</link>
+		<link>
+			<name>android-src</name>
+			<type>2</type>
+			<location>D:/AdvancedKWS/kws_repo/android/src</location>
+		</link>
+	</linkedResources>
 </projectDescription>

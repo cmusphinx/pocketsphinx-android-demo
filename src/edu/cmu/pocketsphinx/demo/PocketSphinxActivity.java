@@ -20,6 +20,9 @@ import edu.cmu.pocketsphinx.SphinxUtil;
 
 public class PocketSphinxActivity extends Activity {
 
+    protected static String KWS_SRCH_NAME = "wakeup_search";
+    protected static String KEYPHRASE = "oh mighty computer";
+
     static {
         System.loadLibrary("pocketsphinx_jni");
     }
@@ -44,23 +47,23 @@ public class PocketSphinxActivity extends Activity {
         
         Config config = Decoder.defaultConfig();
         config.setString("-dict", joinPath(appDir, "models/lm/cmu07a.dic"));
-        config.setString("-hmm", joinPath(appDir, "models/hmm/hub4wsj_sc_8k"));
+        config.setString("-hmm", joinPath(appDir, "models/hmm/en-us-semi"));
         config.setString("-rawlogdir", appDir.getPath());
-        config.setFloat("-samprate", 8000);
         config.setInt("-maxhmmpf", 10000);
+        config.setBoolean("-fwdflat", false);
         config.setBoolean("-bestpath", false);
-        config.setBoolean("-remove_noise", false);
+        config.setFloat("-kws_threshold", 0.95);
         recognizer = new SpeechRecognizer(config);
         
-        Decoder decoder = recognizer.getDecoder();        
+        recognizer.setKws(KWS_SRCH_NAME, KEYPHRASE);
         Jsgf jsgf = new Jsgf(joinPath(appDir, "models/dialog.gram"));
         JsgfRule rule = jsgf.getRule("<dialog.command>");
         int lw = config.getInt("-lw");
-        FsgModel fsg = jsgf.buildFsg(rule, decoder.getLogmath(), lw);
-        decoder.setFsg(BankAccountFragment.class.getSimpleName(), fsg);
-        decoder.setSearch(BankAccountFragment.class.getSimpleName());
+        FsgModel fsg = jsgf.buildFsg(rule, recognizer.getLogmath(), lw);
+        recognizer.setFsg(BankAccountFragment.class.getSimpleName(), fsg);
+        recognizer.setSearch(BankAccountFragment.class.getSimpleName());
         NGramModel lm = new NGramModel(joinPath(appDir, "models/lm/weather.dmp"));
-        decoder.setLm(WeatherForecastFragment.class.getSimpleName(), lm);
+        recognizer.setLm(WeatherForecastFragment.class.getSimpleName(), lm);
         
         tabBar = getActionBar();
         tabBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
