@@ -7,11 +7,11 @@
   <string name="deposit_fmt">You have deposited $%.2f</string>
   <string name="withdraw_fmt">You have withdrawn $%.2f</string>
 
-  <string name="bank_help_text1">Commit bank operations using voice commands such as</string>
+  <string name="bank_help_text1">Grammar example. Start the operation by saying &lt;Oh mighty computer&gt;. Then give a command such as:</string>
   <string name="bank_help_text2">- deposit &lt;amount&gt;</string>
   <string name="bank_help_text3">- withdraw &lt;amount&gt;</string>
   
-  <string name="weather_help_text1">Try some weather forecast, consider these examples:</string>
+  <string name="weather_help_text1">Statistical language model example. Start the operation by saying &lt;Oh mighty computer&gt;. Then say something about weather, for example:</string>
   <string name="weather_help_text2">- sunny spells on Wednesday</string>
   <string name="weather_help_text3">- some fog patches tonight</string>
 </resources>

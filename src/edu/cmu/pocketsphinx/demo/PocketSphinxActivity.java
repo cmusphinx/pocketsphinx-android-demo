@@ -52,7 +52,7 @@ public class PocketSphinxActivity extends Activity {
         config.setInt("-maxhmmpf", 10000);
         config.setBoolean("-fwdflat", false);
         config.setBoolean("-bestpath", false);
-        config.setFloat("-kws_threshold", 0.95);
+        config.setFloat("-kws_threshold", 1e-5);
         recognizer = new SpeechRecognizer(config);
         
         recognizer.setKws(KWS_SRCH_NAME, KEYPHRASE);
