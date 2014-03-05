@@ -62,7 +62,7 @@ public class PocketSphinxActivity extends Activity {
         FsgModel fsg = jsgf.buildFsg(rule, recognizer.getLogmath(), lw);
         recognizer.setFsg(BankAccountFragment.class.getSimpleName(), fsg);
         recognizer.setSearch(BankAccountFragment.class.getSimpleName());
-        NGramModel lm = new NGramModel(joinPath(appDir, "models/lm/weather.dmp"));
+        NGramModel lm = new NGramModel(config, recognizer.getLogmath(), joinPath(appDir, "models/lm/weather.dmp"));
         recognizer.setLm(WeatherForecastFragment.class.getSimpleName(), lm);
         
         tabBar = getActionBar();
