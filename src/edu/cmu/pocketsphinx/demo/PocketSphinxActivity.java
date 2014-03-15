@@ -9,6 +9,8 @@ import android.app.ActionBar.TabListener;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+
+import edu.cmu.pocketsphinx.Assets;
 import edu.cmu.pocketsphinx.Config;
 import edu.cmu.pocketsphinx.Decoder;
 import edu.cmu.pocketsphinx.FsgModel;
@@ -16,7 +18,6 @@ import edu.cmu.pocketsphinx.Jsgf;
 import edu.cmu.pocketsphinx.JsgfRule;
 import edu.cmu.pocketsphinx.NGramModel;
 import edu.cmu.pocketsphinx.SpeechRecognizer;
-import edu.cmu.pocketsphinx.SphinxUtil;
 
 public class PocketSphinxActivity extends Activity {
 
@@ -40,7 +41,7 @@ public class PocketSphinxActivity extends Activity {
         
         File appDir;
         try {
-            appDir = SphinxUtil.syncAssets(getApplicationContext());
+            appDir = Assets.syncAssets(getApplicationContext());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
