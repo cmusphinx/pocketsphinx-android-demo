@@ -1,99 +1,130 @@
 package edu.cmu.pocketsphinx.demo;
 
+import static edu.cmu.pocketsphinx.Assets.syncAssets;
+import static edu.cmu.pocketsphinx.Decoder.defaultConfig;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-import android.app.ActionBar;
-import android.app.ActionBar.Tab;
-import android.app.ActionBar.TabListener;
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
+import android.os.Vibrator;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.ToggleButton;
+import edu.cmu.pocketsphinx.*;
 
-import edu.cmu.pocketsphinx.Assets;
-import edu.cmu.pocketsphinx.Config;
-import edu.cmu.pocketsphinx.Decoder;
-import edu.cmu.pocketsphinx.FsgModel;
-import edu.cmu.pocketsphinx.Jsgf;
-import edu.cmu.pocketsphinx.JsgfRule;
-import edu.cmu.pocketsphinx.NGramModel;
-import edu.cmu.pocketsphinx.SpeechRecognizer;
 
-public class PocketSphinxActivity extends Activity {
+public class PocketSphinxActivity extends Activity implements
+        RecognitionListener {
 
-    protected static String KWS_SRCH_NAME = "wakeup_search";
-    protected static String KEYPHRASE = "oh mighty computer";
+    private static String KWS_SEARCH_NAME = "wakeup";
+    private static String KEYPHRASE = "oh mighty computer";
 
     static {
         System.loadLibrary("pocketsphinx_jni");
     }
-    
-    private static String joinPath(File dir, String path) {
-        return new File(dir, path).getPath();
-    }
-    
-    private ActionBar tabBar;
+
+    private File assetDir;
     private SpeechRecognizer recognizer;
+    private final Map<String, Integer> captions = new HashMap<String, Integer>();
+
+    public PocketSphinxActivity() {
+        captions.put(KWS_SEARCH_NAME, R.string.kws_caption);
+        captions.put("menu", R.string.menu_caption);
+        captions.put("digits", R.string.digits_caption);
+        captions.put("forecast", R.string.forecast_caption);
+    }
 
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
-        
-        File appDir;
+
         try {
-            appDir = Assets.syncAssets(getApplicationContext());
+            assetDir = syncAssets(getApplicationContext());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to synchronize assets", e);
         }
-        
-        Config config = Decoder.defaultConfig();
-        config.setString("-dict", joinPath(appDir, "models/lm/cmu07a.dic"));
-        config.setString("-hmm", joinPath(appDir, "models/hmm/en-us-semi"));
-        config.setString("-rawlogdir", appDir.getPath());
+
+        Config config = defaultConfig();
+        config.setString("-dict", joinPath(assetDir, "models/lm/cmu07a.dic"));
+        config.setString("-hmm", joinPath(assetDir, "models/hmm/en-us-semi"));
+        config.setString("-rawlogdir", assetDir.getPath());
         config.setInt("-maxhmmpf", 10000);
         config.setBoolean("-fwdflat", false);
         config.setBoolean("-bestpath", false);
         config.setFloat("-kws_threshold", 1e-5);
+
         recognizer = new SpeechRecognizer(config);
-        
-        recognizer.setKws(KWS_SRCH_NAME, KEYPHRASE);
-        Jsgf jsgf = new Jsgf(joinPath(appDir, "models/dialog.gram"));
-        JsgfRule rule = jsgf.getRule("<dialog.command>");
+        recognizer.addListener(this);
+
+        // Create keyword-activation search.
+        recognizer.setKws(KWS_SEARCH_NAME, KEYPHRASE);
+        // Create grammar-based searches.
         int lw = config.getInt("-lw");
-        FsgModel fsg = jsgf.buildFsg(rule, recognizer.getLogmath(), lw);
-        recognizer.setFsg(BankAccountFragment.class.getSimpleName(), fsg);
-        recognizer.setSearch(BankAccountFragment.class.getSimpleName());
-        NGramModel lm = new NGramModel(config, recognizer.getLogmath(), joinPath(appDir, "models/lm/weather.dmp"));
-        recognizer.setLm(WeatherForecastFragment.class.getSimpleName(), lm);
-        
-        tabBar = getActionBar();
-        tabBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        addSearch("menu", "menu.gram", "<menu.item>", lw);
+        addSearch("digits", "digits.gram", "<digits.digits>", lw);
+        // Create language model search.
+        String path = joinPath(assetDir, "models/lm/weather.dmp");
+        NGramModel lm = new NGramModel(config, recognizer.getLogmath(), path);
+        recognizer.setLm("forecast", lm);
 
-        Tab t = tabBar.newTab();
-        t.setText("Bank Account");
-        t.setTabListener(newTabListener(BankAccountFragment.class, state));
-        tabBar.addTab(t);
-
-        t = tabBar.newTab();
-        t.setText("Weather Forecast");
-        t.setTabListener(newTabListener(WeatherForecastFragment.class, state));
-        tabBar.addTab(t);
-
-        if (null != state)
-            tabBar.setSelectedNavigationItem(state.getInt("tab", 0));
+        setContentView(R.layout.main);
+        recognizer.addListener(this);
+        switchSearch(KWS_SEARCH_NAME);
     }
 
-    public SpeechRecognizer getRecognizer() {
-        return recognizer;
+    public void onStartStop(View view) {
+        if (((ToggleButton) view).isChecked())
+            switchSearch("menu");
+        else
+            switchSearch(KWS_SEARCH_NAME);
     }
-        
+
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putInt("tab", tabBar.getSelectedNavigationIndex());
-        super.onSaveInstanceState(outState);
+    public void onPartialResult(Hypothesis hypothesis) {
+        String text = hypothesis.getHypstr();
+
+        if (KEYPHRASE.equals(text)) {
+            switchSearch("menu");
+            ((ToggleButton) findViewById(R.id.start_button)).setChecked(true);
+        } else if ("digits".equals(text)) {
+            switchSearch("digits");
+        } else if ("forecast".equals(text)) {
+            switchSearch("forecast");
+        } else {
+            ((TextView) findViewById(R.id.result_text)).setText(text);
+        }
     }
 
-    <T extends Fragment> TabListener newTabListener(Class<T> c, Bundle state) {
-        return new TabFragmentListener<T>(this, c.getSimpleName(), c, state);
+    @Override
+    public void onResult(Hypothesis hypothesis) {
+        ((TextView) findViewById(R.id.result_text)).setText("");
+    }
+
+    private void addSearch(String name, String path, String ruleName, int lw) {
+        File grammarParent = new File(joinPath(assetDir, "grammar"));
+        Jsgf jsgf = new Jsgf(joinPath(grammarParent, path));
+        JsgfRule rule = jsgf.getRule(ruleName);
+        FsgModel fsg = jsgf.buildFsg(rule, recognizer.getLogmath(), lw);
+        recognizer.setFsg(name, fsg);
+    }
+
+    private void switchSearch(String searchName) {
+        recognizer.stopListening();
+        recognizer.setSearch(searchName);
+        recognizer.startListening();
+        
+        if ("menu".equals(searchName))
+            ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(100);
+
+        String caption = getResources().getString(captions.get(searchName));
+        ((TextView) findViewById(R.id.caption_text)).setText(caption);
+    }
+
+    private static String joinPath(File parent, String path) {
+        return new File(parent, path).getPath();
     }
 }

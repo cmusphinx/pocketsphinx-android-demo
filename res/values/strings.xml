@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-  <string name="app_name">PocketSphinx Demo</string>
-  <string name="start">Start</string>
-  <string name="stop">Stop</string>
-  <string name="balance_fmt">Your balance is $%.2f</string>
-  <string name="deposit_fmt">You have deposited $%.2f</string>
-  <string name="withdraw_fmt">You have withdrawn $%.2f</string>
 
-  <string name="bank_help_text1">Grammar example. Start the operation by saying &lt;Oh mighty computer&gt;. Then give a command such as:</string>
-  <string name="bank_help_text2">- deposit &lt;amount&gt;</string>
-  <string name="bank_help_text3">- withdraw &lt;amount&gt;</string>
-  
-  <string name="weather_help_text1">Statistical language model example. Start the operation by saying &lt;Oh mighty computer&gt;. Then say something about weather, for example:</string>
-  <string name="weather_help_text2">- sunny spells on Wednesday</string>
-  <string name="weather_help_text3">- some fog patches tonight</string>
+    <string name="app_name">PocketSphinx Demo</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    
+    <string name="kws_caption">To start demonstration say \"oh mighty computer\" or push \"Start\".</string>
+    <string name="menu_caption">Say \"digits\" or \"forecast\" to choose particular example.</string>
+    <string name="digits_caption">Let\'s recognize some digits: name several and hit \"Stop\".</string>
+    <string name="forecast_caption">Say something typical to a weather forecast like \"sunny spells on Wednesday\".</string>
 </resources>
