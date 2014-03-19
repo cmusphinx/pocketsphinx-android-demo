@@ -87,12 +87,12 @@ public class PocketSphinxActivity extends Activity implements
     public void onPartialResult(Hypothesis hypothesis) {
         String text = hypothesis.getHypstr();
 
-        if (KEYPHRASE.equals(text)) {
+        if (text.equals(KEYPHRASE)) {
             switchSearch("menu");
             ((ToggleButton) findViewById(R.id.start_button)).setChecked(true);
-        } else if ("digits".equals(text)) {
+        } else if (text.equals("digits")) {
             switchSearch("digits");
-        } else if ("forecast".equals(text)) {
+        } else if (text.equals("forecast")) {
             switchSearch("forecast");
         } else {
             ((TextView) findViewById(R.id.result_text)).setText(text);
@@ -117,7 +117,7 @@ public class PocketSphinxActivity extends Activity implements
         recognizer.setSearch(searchName);
         recognizer.startListening();
         
-        if ("menu".equals(searchName))
+        if (searchName.equals("menu"))
             ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(100);
 
         String caption = getResources().getString(captions.get(searchName));
