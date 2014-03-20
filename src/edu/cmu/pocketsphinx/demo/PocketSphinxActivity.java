@@ -127,4 +127,8 @@ public class PocketSphinxActivity extends Activity implements
     private static String joinPath(File parent, String path) {
         return new File(parent, path).getPath();
     }
+
+    @Override
+    public void onVadStateChanged(boolean arg0) {
+     }
 }
