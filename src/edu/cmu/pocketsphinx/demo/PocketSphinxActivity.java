@@ -2,6 +2,7 @@ package edu.cmu.pocketsphinx.demo;
 
 import static android.widget.Toast.makeText;
 import static edu.cmu.pocketsphinx.Assets.syncAssets;
+import static edu.cmu.pocketsphinx.SpeechRecognizerSetup.defaultSetup;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,12 +47,12 @@ public class PocketSphinxActivity extends Activity implements
             throw new RuntimeException("failed to synchronize assets", e);
         }
 
-        recognizer = SpeechRecognizerBuilder.getBuilder()
+        recognizer = defaultSetup()
                 .setAcousticModel(new File(appDir, "models/hmm/en-us-semi"))
                 .setDictionary(new File(appDir, "models/lm/cmu07a.dic"))
                 .setRawLogDir(appDir)
                 .setKeywordThreshold(1e-5f)
-                .buildRecognizer();
+                .getRecognizer();
 
         recognizer.addListener(this);
         // Create keyword-activation search.
