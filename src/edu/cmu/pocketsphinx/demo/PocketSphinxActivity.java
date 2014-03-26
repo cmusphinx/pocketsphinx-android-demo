@@ -1,7 +1,7 @@
 package edu.cmu.pocketsphinx.demo;
 
+import static android.widget.Toast.makeText;
 import static edu.cmu.pocketsphinx.Assets.syncAssets;
-import static edu.cmu.pocketsphinx.Decoder.defaultConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,125 +10,103 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Vibrator;
-import android.view.View;
+import android.util.Log;
 import android.widget.TextView;
-import android.widget.ToggleButton;
+import android.widget.Toast;
 import edu.cmu.pocketsphinx.*;
 
 
 public class PocketSphinxActivity extends Activity implements
         RecognitionListener {
 
-    private static String KWS_SEARCH_NAME = "wakeup";
-    private static String KEYPHRASE = "oh mighty computer";
+    private static final String KWS_SEARCH_NAME = "wakeup";
+    private static final String FORECAST_SEARCH = "forecast";
+    private static final String DIGITS_SEARCH = "digits";
+    private static final String MENU_SEARCH = "menu";
+    private static final String KEYPHRASE = "oh mighty computer";
 
-    static {
-        System.loadLibrary("pocketsphinx_jni");
-    }
-
-    private File assetDir;
     private SpeechRecognizer recognizer;
     private final Map<String, Integer> captions = new HashMap<String, Integer>();
 
     public PocketSphinxActivity() {
         captions.put(KWS_SEARCH_NAME, R.string.kws_caption);
-        captions.put("menu", R.string.menu_caption);
-        captions.put("digits", R.string.digits_caption);
-        captions.put("forecast", R.string.forecast_caption);
+        captions.put(MENU_SEARCH, R.string.menu_caption);
+        captions.put(DIGITS_SEARCH, R.string.digits_caption);
+        captions.put(FORECAST_SEARCH, R.string.forecast_caption);
     }
 
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
+        File appDir;
 
         try {
-            assetDir = syncAssets(getApplicationContext());
+            appDir = syncAssets(getApplicationContext());
         } catch (IOException e) {
-            throw new RuntimeException("Failed to synchronize assets", e);
+            throw new RuntimeException("failed to synchronize assets", e);
         }
 
-        Config config = defaultConfig();
-        config.setString("-dict", joinPath(assetDir, "models/lm/cmu07a.dic"));
-        config.setString("-hmm", joinPath(assetDir, "models/hmm/en-us-semi"));
-        config.setString("-rawlogdir", assetDir.getPath());
-        config.setInt("-maxhmmpf", 10000);
-        config.setBoolean("-fwdflat", false);
-        config.setBoolean("-bestpath", false);
-        config.setFloat("-kws_threshold", 1e-5);
+        recognizer = SpeechRecognizerBuilder.getBuilder()
+                .setAcousticModel(new File(appDir, "models/hmm/en-us-semi"))
+                .setDictionary(new File(appDir, "models/lm/cmu07a.dic"))
+                .setRawLogDir(appDir)
+                .setKeywordThreshold(1e-5f)
+                .buildRecognizer();
 
-        recognizer = new SpeechRecognizer(config);
         recognizer.addListener(this);
-
         // Create keyword-activation search.
-        recognizer.setKws(KWS_SEARCH_NAME, KEYPHRASE);
+        recognizer.addKeywordSearch(KWS_SEARCH_NAME, KEYPHRASE);
         // Create grammar-based searches.
-        int lw = config.getInt("-lw");
-        addSearch("menu", "menu.gram", "<menu.item>", lw);
-        addSearch("digits", "digits.gram", "<digits.digits>", lw);
+        File menuGrammar = new File(appDir, "models/grammar/menu.gram");
+        recognizer.addGrammarSearch(MENU_SEARCH, menuGrammar);
+        File digitsGrammar = new File(appDir, "models/grammar/digits.gram");
+        recognizer.addGrammarSearch(DIGITS_SEARCH, digitsGrammar);
         // Create language model search.
-        String path = joinPath(assetDir, "models/lm/weather.dmp");
-        NGramModel lm = new NGramModel(config, recognizer.getLogmath(), path);
-        recognizer.setLm("forecast", lm);
+        File languageModel = new File(appDir, "models/lm/weather.dmp");
+        recognizer.addNgramSearch(FORECAST_SEARCH, languageModel);
 
         setContentView(R.layout.main);
-        recognizer.addListener(this);
         switchSearch(KWS_SEARCH_NAME);
-    }
-
-    public void onStartStop(View view) {
-        if (((ToggleButton) view).isChecked())
-            switchSearch("menu");
-        else
-            switchSearch(KWS_SEARCH_NAME);
     }
 
     @Override
     public void onPartialResult(Hypothesis hypothesis) {
         String text = hypothesis.getHypstr();
+        Log.d(getClass().getSimpleName(), "on partial: " + text);
 
-        if (text.equals(KEYPHRASE)) {
-            switchSearch("menu");
-            ((ToggleButton) findViewById(R.id.start_button)).setChecked(true);
-        } else if (text.equals("digits")) {
-            switchSearch("digits");
-        } else if (text.equals("forecast")) {
-            switchSearch("forecast");
-        } else {
+        if (text.equals(KEYPHRASE))
+            switchSearch(MENU_SEARCH);
+        else if (text.equals(DIGITS_SEARCH))
+            switchSearch(DIGITS_SEARCH);
+        else if (text.equals(FORECAST_SEARCH))
+            switchSearch(FORECAST_SEARCH);
+        else
             ((TextView) findViewById(R.id.result_text)).setText(text);
-        }
     }
 
     @Override
     public void onResult(Hypothesis hypothesis) {
         ((TextView) findViewById(R.id.result_text)).setText("");
-    }
-
-    private void addSearch(String name, String path, String ruleName, int lw) {
-        File grammarParent = new File(joinPath(assetDir, "grammar"));
-        Jsgf jsgf = new Jsgf(joinPath(grammarParent, path));
-        JsgfRule rule = jsgf.getRule(ruleName);
-        FsgModel fsg = jsgf.buildFsg(rule, recognizer.getLogmath(), lw);
-        recognizer.setFsg(name, fsg);
+        String text = hypothesis.getHypstr();
+        makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
     }
 
     private void switchSearch(String searchName) {
-        recognizer.stopListening();
-        recognizer.setSearch(searchName);
-        recognizer.startListening();
-        
-        if (searchName.equals("menu"))
-            ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(100);
+        recognizer.stop();
+        recognizer.startListening(searchName);
 
         String caption = getResources().getString(captions.get(searchName));
         ((TextView) findViewById(R.id.caption_text)).setText(caption);
     }
 
-    private static String joinPath(File parent, String path) {
-        return new File(parent, path).getPath();
+    @Override
+    public void onBeginningOfSpeech() {
     }
 
     @Override
-    public void onVadStateChanged(boolean arg0) {
-     }
+    public void onEndOfSpeech() {
+        if (DIGITS_SEARCH.equals(recognizer.getSearchName())
+                || FORECAST_SEARCH.equals(recognizer.getSearchName()))
+            switchSearch(KWS_SEARCH_NAME);
+    }
 }
