@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="assets">
   <property name="assets.dir" value="assets"/>
-  <property name="assets.list.name" value=".assets"/>
+  <property name="assets.list.name" value="assets.lst"/>
   <property name="assets.hash.type" value="md5"/>
   <property name="assets.ctl.files"
     value="**/*.${assets.hash.type},${assets.list.name}"/>
