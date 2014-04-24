@@ -1,24 +1,22 @@
 package edu.cmu.pocketsphinx.demo;
 
 import static android.widget.Toast.makeText;
-import static edu.cmu.pocketsphinx.Assets.syncAssets;
 import static edu.cmu.pocketsphinx.SpeechRecognizerSetup.defaultSetup;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 import edu.cmu.pocketsphinx.*;
 
 
 public class PocketSphinxActivity extends Activity implements
-        RecognitionListener {
+        RecognitionListener, AssetsTaskCallback {
 
     private static final String KWS_SEARCH_NAME = "wakeup";
     private static final String FORECAST_SEARCH = "forecast";
@@ -27,9 +25,11 @@ public class PocketSphinxActivity extends Activity implements
     private static final String KEYPHRASE = "oh mighty computer";
 
     private SpeechRecognizer recognizer;
-    private final Map<String, Integer> captions = new HashMap<String, Integer>();
+    private final Map<String, Integer> captions;
+    private ProgressDialog dialog;
 
     public PocketSphinxActivity() {
+        captions = new HashMap<String, Integer>();
         captions.put(KWS_SEARCH_NAME, R.string.kws_caption);
         captions.put(MENU_SEARCH, R.string.menu_caption);
         captions.put(DIGITS_SEARCH, R.string.digits_caption);
@@ -39,42 +39,14 @@ public class PocketSphinxActivity extends Activity implements
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
-        File appDir;
-
-        try {
-            appDir = syncAssets(getApplicationContext());
-        } catch (IOException e) {
-            throw new RuntimeException("failed to synchronize assets", e);
-        }
-
-        recognizer = defaultSetup()
-                .setAcousticModel(new File(appDir, "models/hmm/en-us-semi"))
-                .setDictionary(new File(appDir, "models/lm/cmu07a.dic"))
-                .setRawLogDir(appDir)
-                .setKeywordThreshold(1e-5f)
-                .getRecognizer();
-
-        recognizer.addListener(this);
-        // Create keyword-activation search.
-        recognizer.addKeywordSearch(KWS_SEARCH_NAME, KEYPHRASE);
-        // Create grammar-based searches.
-        File menuGrammar = new File(appDir, "models/grammar/menu.gram");
-        recognizer.addGrammarSearch(MENU_SEARCH, menuGrammar);
-        File digitsGrammar = new File(appDir, "models/grammar/digits.gram");
-        recognizer.addGrammarSearch(DIGITS_SEARCH, digitsGrammar);
-        // Create language model search.
-        File languageModel = new File(appDir, "models/lm/weather.dmp");
-        recognizer.addNgramSearch(FORECAST_SEARCH, languageModel);
-
         setContentView(R.layout.main);
-        switchSearch(KWS_SEARCH_NAME);
+        dialog = new ProgressDialog(this);
+        new AssetsTask(this, this).execute();
     }
 
     @Override
     public void onPartialResult(Hypothesis hypothesis) {
         String text = hypothesis.getHypstr();
-        Log.d(getClass().getSimpleName(), "on partial: " + text);
-
         if (text.equals(KEYPHRASE))
             switchSearch(MENU_SEARCH);
         else if (text.equals(DIGITS_SEARCH))
@@ -109,5 +81,51 @@ public class PocketSphinxActivity extends Activity implements
         if (DIGITS_SEARCH.equals(recognizer.getSearchName())
                 || FORECAST_SEARCH.equals(recognizer.getSearchName()))
             switchSearch(KWS_SEARCH_NAME);
+    }
+
+    @Override
+    public void onTaskCancelled() {
+    }
+
+    @Override
+    public void onTaskComplete(File appDir) {
+        recognizer = defaultSetup()
+                .setAcousticModel(new File(appDir, "models/hmm/en-us-semi"))
+                .setDictionary(new File(appDir, "models/lm/cmu07a.dic"))
+                .setRawLogDir(appDir)
+                .setKeywordThreshold(1e-5f)
+                .getRecognizer();
+
+        recognizer.addListener(this);
+        // Create keyword-activation search.
+        recognizer.addKeywordSearch(KWS_SEARCH_NAME, KEYPHRASE);
+        // Create grammar-based searches.
+        File menuGrammar = new File(appDir, "models/grammar/menu.gram");
+        recognizer.addGrammarSearch(MENU_SEARCH, menuGrammar);
+        File digitsGrammar = new File(appDir, "models/grammar/digits.gram");
+        recognizer.addGrammarSearch(DIGITS_SEARCH, digitsGrammar);
+        // Create language model search.
+        File languageModel = new File(appDir, "models/lm/weather.dmp");
+        recognizer.addNgramSearch(FORECAST_SEARCH, languageModel);
+
+        switchSearch(KWS_SEARCH_NAME);
+        dialog.dismiss();
+    }
+
+    @Override
+    public void onTaskError(Throwable e) {
+        ((TextView) findViewById(R.id.caption_text)).setText(e.getMessage());
+    }
+
+    @Override
+    public void onTaskProgress(File file) {
+        dialog.incrementProgressBy(1);
+    }
+
+    @Override
+    public void onTaskStart(int size) {
+        dialog.setTitle("Copying model files...");
+        dialog.setMax(size);
+        dialog.show();
     }
 }
