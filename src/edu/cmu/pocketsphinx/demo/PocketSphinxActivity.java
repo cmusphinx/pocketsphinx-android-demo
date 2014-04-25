@@ -40,7 +40,6 @@ public class PocketSphinxActivity extends Activity implements
     public void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.main);
-        dialog = new ProgressDialog(this);
         new AssetsTask(this, this).execute();
     }
 
@@ -122,12 +121,13 @@ public class PocketSphinxActivity extends Activity implements
 
     @Override
     public void onTaskProgress(File file) {
-        dialog.setMessage(file.getName());
         dialog.incrementProgressBy(1);
     }
 
     @Override
     public void onTaskStart(int size) {
+        dialog = new ProgressDialog(this);
+        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         dialog.setTitle("Copying model files...");
         dialog.setMax(size);
         dialog.show();
