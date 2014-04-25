@@ -88,11 +88,12 @@ public class PocketSphinxActivity extends Activity implements
     }
 
     @Override
-    public void onTaskComplete(File appDir) {
+    public void onTaskComplete(File assetsDir) {
+        File modelsDir = new File(assetsDir, "models");
         recognizer = defaultSetup()
-                .setAcousticModel(new File(appDir, "models/hmm/en-us-semi"))
-                .setDictionary(new File(appDir, "models/lm/cmu07a.dic"))
-                .setRawLogDir(appDir)
+                .setAcousticModel(new File(modelsDir, "hmm/en-us-semi"))
+                .setDictionary(new File(modelsDir, "lm/cmu07a.dic"))
+                .setRawLogDir(assetsDir)
                 .setKeywordThreshold(1e-5f)
                 .getRecognizer();
 
@@ -100,12 +101,12 @@ public class PocketSphinxActivity extends Activity implements
         // Create keyword-activation search.
         recognizer.addKeywordSearch(KWS_SEARCH_NAME, KEYPHRASE);
         // Create grammar-based searches.
-        File menuGrammar = new File(appDir, "models/grammar/menu.gram");
+        File menuGrammar = new File(modelsDir, "grammar/menu.gram");
         recognizer.addGrammarSearch(MENU_SEARCH, menuGrammar);
-        File digitsGrammar = new File(appDir, "models/grammar/digits.gram");
+        File digitsGrammar = new File(modelsDir, "grammar/digits.gram");
         recognizer.addGrammarSearch(DIGITS_SEARCH, digitsGrammar);
         // Create language model search.
-        File languageModel = new File(appDir, "models/lm/weather.dmp");
+        File languageModel = new File(modelsDir, "lm/weather.dmp");
         recognizer.addNgramSearch(FORECAST_SEARCH, languageModel);
 
         switchSearch(KWS_SEARCH_NAME);
@@ -114,11 +115,14 @@ public class PocketSphinxActivity extends Activity implements
 
     @Override
     public void onTaskError(Throwable e) {
+        if (dialog.isShowing())
+            dialog.dismiss();
         ((TextView) findViewById(R.id.caption_text)).setText(e.getMessage());
     }
 
     @Override
     public void onTaskProgress(File file) {
+        dialog.setMessage(file.getName());
         dialog.incrementProgressBy(1);
     }
 
