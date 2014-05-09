@@ -98,7 +98,7 @@ public class PocketSphinxActivity extends Activity implements
 
         recognizer.addListener(this);
         // Create keyword-activation search.
-        recognizer.addKeywordSearch(KWS_SEARCH_NAME, KEYPHRASE);
+        recognizer.addKeyphraseSearch(KWS_SEARCH_NAME, KEYPHRASE);
         // Create grammar-based searches.
         File menuGrammar = new File(modelsDir, "grammar/menu.gram");
         recognizer.addGrammarSearch(MENU_SEARCH, menuGrammar);
