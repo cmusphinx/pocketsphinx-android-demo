@@ -59,8 +59,10 @@ public class PocketSphinxActivity extends Activity implements
     @Override
     public void onResult(Hypothesis hypothesis) {
         ((TextView) findViewById(R.id.result_text)).setText("");
-        String text = hypothesis.getHypstr();
-        makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+        if (hypothesis != null) {
+    	    String text = hypothesis.getHypstr();
+    	    makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+	}
     }
 
     private void switchSearch(String searchName) {
