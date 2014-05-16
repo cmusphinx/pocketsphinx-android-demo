@@ -8,5 +8,5 @@ models/hmm/en-us-semi/noisedict
 models/hmm/en-us-semi/sendump
 models/hmm/en-us-semi/transition_matrices
 models/hmm/en-us-semi/variances
-models/lm/cmu07a.dic
+models/dict/cmu07a.dic
 models/lm/weather.dmp

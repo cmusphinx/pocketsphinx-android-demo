@@ -145,7 +145,7 @@ public class PocketSphinxActivity extends Activity implements
         File modelsDir = new File(assetsDir, "models");
         recognizer = defaultSetup()
                 .setAcousticModel(new File(modelsDir, "hmm/en-us-semi"))
-                .setDictionary(new File(modelsDir, "lm/cmu07a.dic"))
+                .setDictionary(new File(modelsDir, "dict/cmu07a.dic"))
                 .setRawLogDir(assetsDir).setKeywordThreshold(1e-20f)
                 .getRecognizer();
         recognizer.addListener(this);
