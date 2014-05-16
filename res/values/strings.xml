@@ -7,6 +7,6 @@
     
     <string name="kws_caption">To start demonstration say \"oh mighty computer\".</string>
     <string name="menu_caption">Say \"digits\" or \"forecast\" to choose particular example.</string>
-    <string name="digits_caption">Let\'s recognize some digits: name several and hit \"Stop\".</string>
+    <string name="digits_caption">Let\'s recognize some digits: say something like \"one two three four five\".</string>
     <string name="forecast_caption">Say something typical to a weather forecast like \"sunny spells on Wednesday\".</string>
 </resources>
