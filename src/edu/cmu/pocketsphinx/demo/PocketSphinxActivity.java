@@ -103,6 +103,9 @@ public class PocketSphinxActivity extends Activity implements
 
     @Override
     public void onPartialResult(Hypothesis hypothesis) {
+        if (hypothesis == null)
+    	    return;
+
         String text = hypothesis.getHypstr();
         if (text.equals(KEYPHRASE))
             switchSearch(MENU_SEARCH);
@@ -146,7 +149,7 @@ public class PocketSphinxActivity extends Activity implements
         recognizer = defaultSetup()
                 .setAcousticModel(new File(modelsDir, "hmm/en-us-semi"))
                 .setDictionary(new File(modelsDir, "dict/cmu07a.dic"))
-                .setRawLogDir(assetsDir).setKeywordThreshold(1e-20f)
+                .setRawLogDir(assetsDir).setKeywordThreshold(1e-40f)
                 .getRecognizer();
         recognizer.addListener(this);
 
