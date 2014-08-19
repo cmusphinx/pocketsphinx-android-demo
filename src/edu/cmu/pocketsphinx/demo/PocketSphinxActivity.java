@@ -132,14 +132,19 @@ public class PocketSphinxActivity extends Activity implements
 
     @Override
     public void onEndOfSpeech() {
-        if (DIGITS_SEARCH.equals(recognizer.getSearchName())
-                || FORECAST_SEARCH.equals(recognizer.getSearchName()))
+        if (!recognizer.getSearchName().equals(KWS_SEARCH))
             switchSearch(KWS_SEARCH);
     }
 
     private void switchSearch(String searchName) {
         recognizer.stop();
-        recognizer.startListening(searchName);
+        
+        // If we are not spotting, start listening with timeout
+        if (searchName.equals(KWS_SEARCH))
+            recognizer.startListening(searchName);
+        else
+            recognizer.startListening(searchName, 10);
+
         String caption = getResources().getString(captions.get(searchName));
         ((TextView) findViewById(R.id.caption_text)).setText(caption);
     }
