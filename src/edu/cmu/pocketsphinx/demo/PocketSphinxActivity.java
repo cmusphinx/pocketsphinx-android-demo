@@ -143,7 +143,7 @@ public class PocketSphinxActivity extends Activity implements
         if (searchName.equals(KWS_SEARCH))
             recognizer.startListening(searchName);
         else
-            recognizer.startListening(searchName, 10);
+            recognizer.startListening(searchName, 10000);
 
         String caption = getResources().getString(captions.get(searchName));
         ((TextView) findViewById(R.id.caption_text)).setText(caption);
