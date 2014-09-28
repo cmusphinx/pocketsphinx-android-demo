@@ -49,7 +49,8 @@ import edu.cmu.pocketsphinx.SpeechRecognizer;
 
 public class PocketSphinxActivity extends Activity implements
         RecognitionListener {
-
+		
+    private static final String TAG = PocketSphinxActivity.class.getName();
     private static final String KWS_SEARCH = "wakeup";
     private static final String FORECAST_SEARCH = "forecast";
     private static final String DIGITS_SEARCH = "digits";
@@ -168,5 +169,10 @@ public class PocketSphinxActivity extends Activity implements
         // Create language model search.
         File languageModel = new File(modelsDir, "lm/weather.dmp");
         recognizer.addNgramSearch(FORECAST_SEARCH, languageModel);
+    }
+
+    @Override
+    public void onError(Exception error) {
+        ((TextView) findViewById(R.id.caption_text)).setText(error.getMessage());
     }
 }
