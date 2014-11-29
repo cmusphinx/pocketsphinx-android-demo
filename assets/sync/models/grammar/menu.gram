@@ -2,4 +2,4 @@
 
 grammar menu;
 
-public <item> = digits | forecast;
+public <item> = digits | forecast | phones;

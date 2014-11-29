@@ -50,10 +50,10 @@ import edu.cmu.pocketsphinx.SpeechRecognizer;
 public class PocketSphinxActivity extends Activity implements
         RecognitionListener {
 		
-    private static final String TAG = PocketSphinxActivity.class.getName();
     private static final String KWS_SEARCH = "wakeup";
     private static final String FORECAST_SEARCH = "forecast";
     private static final String DIGITS_SEARCH = "digits";
+    private static final String PHONE_SEARCH = "phones";
     private static final String MENU_SEARCH = "menu";
     private static final String KEYPHRASE = "oh mighty computer";
 
@@ -69,6 +69,7 @@ public class PocketSphinxActivity extends Activity implements
         captions.put(KWS_SEARCH, R.string.kws_caption);
         captions.put(MENU_SEARCH, R.string.menu_caption);
         captions.put(DIGITS_SEARCH, R.string.digits_caption);
+        captions.put(PHONE_SEARCH, R.string.phone_caption);
         captions.put(FORECAST_SEARCH, R.string.forecast_caption);
         setContentView(R.layout.main);
         ((TextView) findViewById(R.id.caption_text))
@@ -112,6 +113,8 @@ public class PocketSphinxActivity extends Activity implements
             switchSearch(MENU_SEARCH);
         else if (text.equals(DIGITS_SEARCH))
             switchSearch(DIGITS_SEARCH);
+        else if (text.equals(PHONE_SEARCH))
+            switchSearch(PHONE_SEARCH);
         else if (text.equals(FORECAST_SEARCH))
             switchSearch(FORECAST_SEARCH);
         else
@@ -151,28 +154,53 @@ public class PocketSphinxActivity extends Activity implements
     }
 
     private void setupRecognizer(File assetsDir) {
+        // The recognizer can be configured to perform multiple searches
+        // of different kind and switch between them
+        
         File modelsDir = new File(assetsDir, "models");
         recognizer = defaultSetup()
                 .setAcousticModel(new File(modelsDir, "hmm/en-us-semi"))
                 .setDictionary(new File(modelsDir, "dict/cmu07a.dic"))
-                .setRawLogDir(assetsDir).setKeywordThreshold(1e-40f)
+                
+                // To disable logging of raw audio comment out this call (takes a lot of space on the device)
+                .setRawLogDir(assetsDir)
+                
+                // Threshold to tune for keyphrase
+                .setKeywordThreshold(1e-40f)
+                
+                // Use context-independent phonetic search, context-dependent is too slow for mobile
+                .setBoolean("-allphone_ci", true)
+                
                 .getRecognizer();
         recognizer.addListener(this);
 
         // Create keyword-activation search.
         recognizer.addKeyphraseSearch(KWS_SEARCH, KEYPHRASE);
-        // Create grammar-based searches.
+        
+        // Create grammar-based search for selection between demos
         File menuGrammar = new File(modelsDir, "grammar/menu.gram");
         recognizer.addGrammarSearch(MENU_SEARCH, menuGrammar);
+
+        // Create grammar-based search for digit recognition
         File digitsGrammar = new File(modelsDir, "grammar/digits.gram");
         recognizer.addGrammarSearch(DIGITS_SEARCH, digitsGrammar);
-        // Create language model search.
+        
+        // Create language model search
         File languageModel = new File(modelsDir, "lm/weather.dmp");
         recognizer.addNgramSearch(FORECAST_SEARCH, languageModel);
+        
+        // Phonetic search
+        File phoneticModel = new File(modelsDir, "phone/en-phone.dmp");
+        recognizer.addAllphoneSearch(PHONE_SEARCH, phoneticModel);
     }
 
     @Override
     public void onError(Exception error) {
         ((TextView) findViewById(R.id.caption_text)).setText(error.getMessage());
+    }
+
+    @Override
+    public void onTimeout() {
+        switchSearch(KWS_SEARCH);
     }
 }
