@@ -106,6 +106,13 @@ public class PocketSphinxActivity extends Activity implements
         }.execute();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        recognizer.cancel();
+        recognizer.shutdown();
+    }
+    
     /**
      * In partial result we get quick updates about current hypothesis. In
      * keyword spotting mode we can react here, in other modes we need to wait
