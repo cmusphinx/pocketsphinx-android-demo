@@ -180,14 +180,14 @@ public class PocketSphinxActivity extends Activity implements
         
         File modelsDir = new File(assetsDir, "models");
         recognizer = defaultSetup()
-                .setAcousticModel(new File(modelsDir, "hmm/en-us-semi"))
-                .setDictionary(new File(modelsDir, "dict/cmu07a.dic"))
+                .setAcousticModel(new File(modelsDir, "hmm/en-us-ptm"))
+                .setDictionary(new File(modelsDir, "dict/cmudict-en-us.dict"))
                 
                 // To disable logging of raw audio comment out this call (takes a lot of space on the device)
                 .setRawLogDir(assetsDir)
                 
                 // Threshold to tune for keyphrase to balance between false alarms and misses
-                .setKeywordThreshold(1e-40f)
+                .setKeywordThreshold(1e-45f)
                 
                 // Use context-independent phonetic search, context-dependent is too slow for mobile
                 .setBoolean("-allphone_ci", true)
