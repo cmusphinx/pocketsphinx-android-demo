@@ -78,45 +78,46 @@ public class PocketSphinxActivity extends Activity implements
         int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO);
         if (permissionCheck == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, MY_PERMISSIONS_REQUEST_RECORD_AUDIO);
-        } else {
-            // Prepare the data for UI
-            captions = new HashMap<String, Integer>();
-            captions.put(KWS_SEARCH, R.string.kws_caption);
-            captions.put(MENU_SEARCH, R.string.menu_caption);
-            captions.put(DIGITS_SEARCH, R.string.digits_caption);
-            captions.put(PHONE_SEARCH, R.string.phone_caption);
-            captions.put(FORECAST_SEARCH, R.string.forecast_caption);
-            setContentView(R.layout.main);
-            ((TextView) findViewById(R.id.caption_text))
-                    .setText("Preparing the recognizer");
-
-            // Recognizer initialization is a time-consuming and it involves IO,
-            // so we execute it in async task
-
-            new AsyncTask<Void, Void, Exception>() {
-                @Override
-                protected Exception doInBackground(Void... params) {
-                    try {
-                        Assets assets = new Assets(PocketSphinxActivity.this);
-                        File assetDir = assets.syncAssets();
-                        setupRecognizer(assetDir);
-                    } catch (IOException e) {
-                        return e;
-                    }
-                    return null;
-                }
-
-                @Override
-                protected void onPostExecute(Exception result) {
-                    if (result != null) {
-                        ((TextView) findViewById(R.id.caption_text))
-                                .setText("Failed to init recognizer " + result);
-                    } else {
-                        switchSearch(KWS_SEARCH);
-                    }
-                }
-            }.execute();
+            return;
         }
+
+        // Prepare the data for UI
+        captions = new HashMap<String, Integer>();
+        captions.put(KWS_SEARCH, R.string.kws_caption);
+        captions.put(MENU_SEARCH, R.string.menu_caption);
+        captions.put(DIGITS_SEARCH, R.string.digits_caption);
+        captions.put(PHONE_SEARCH, R.string.phone_caption);
+        captions.put(FORECAST_SEARCH, R.string.forecast_caption);
+        setContentView(R.layout.main);
+        ((TextView) findViewById(R.id.caption_text))
+                .setText("Preparing the recognizer");
+
+        // Recognizer initialization is a time-consuming and it involves IO,
+        // so we execute it in async task
+
+        new AsyncTask<Void, Void, Exception>() {
+            @Override
+            protected Exception doInBackground(Void... params) {
+                try {
+                    Assets assets = new Assets(PocketSphinxActivity.this);
+                    File assetDir = assets.syncAssets();
+                    setupRecognizer(assetDir);
+                } catch (IOException e) {
+                    return e;
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Exception result) {
+                if (result != null) {
+                    ((TextView) findViewById(R.id.caption_text))
+                            .setText("Failed to init recognizer " + result);
+                } else {
+                    switchSearch(KWS_SEARCH);
+                }
+            }
+        }.execute();
     }
 
     @Override
