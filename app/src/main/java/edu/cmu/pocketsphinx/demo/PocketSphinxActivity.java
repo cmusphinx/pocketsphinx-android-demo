@@ -37,9 +37,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.widget.TextView;
 import android.widget.Toast;
 import edu.cmu.pocketsphinx.Assets;
@@ -49,16 +54,18 @@ import edu.cmu.pocketsphinx.SpeechRecognizer;
 
 public class PocketSphinxActivity extends Activity implements
         RecognitionListener {
-		
+
     /* Named searches allow to quickly reconfigure the decoder */
     private static final String KWS_SEARCH = "wakeup";
     private static final String FORECAST_SEARCH = "forecast";
     private static final String DIGITS_SEARCH = "digits";
     private static final String PHONE_SEARCH = "phones";
     private static final String MENU_SEARCH = "menu";
-    
+
     /* Keyword we are looking for to activate menu */
     private static final String KEYPHRASE = "oh mighty computer";
+
+    private static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
 
     private SpeechRecognizer recognizer;
     private HashMap<String, Integer> captions;
@@ -67,52 +74,84 @@ public class PocketSphinxActivity extends Activity implements
     public void onCreate(Bundle state) {
         super.onCreate(state);
 
-        // Prepare the data for UI
-        captions = new HashMap<String, Integer>();
-        captions.put(KWS_SEARCH, R.string.kws_caption);
-        captions.put(MENU_SEARCH, R.string.menu_caption);
-        captions.put(DIGITS_SEARCH, R.string.digits_caption);
-        captions.put(PHONE_SEARCH, R.string.phone_caption);
-        captions.put(FORECAST_SEARCH, R.string.forecast_caption);
-        setContentView(R.layout.main);
-        ((TextView) findViewById(R.id.caption_text))
-                .setText("Preparing the recognizer");
+        // Check if user has given permission to record audio
+        int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO);
+        if (permissionCheck == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, MY_PERMISSIONS_REQUEST_RECORD_AUDIO);
+        } else {
+            // Prepare the data for UI
+            captions = new HashMap<String, Integer>();
+            captions.put(KWS_SEARCH, R.string.kws_caption);
+            captions.put(MENU_SEARCH, R.string.menu_caption);
+            captions.put(DIGITS_SEARCH, R.string.digits_caption);
+            captions.put(PHONE_SEARCH, R.string.phone_caption);
+            captions.put(FORECAST_SEARCH, R.string.forecast_caption);
+            setContentView(R.layout.main);
+            ((TextView) findViewById(R.id.caption_text))
+                    .setText("Preparing the recognizer");
 
-        // Recognizer initialization is a time-consuming and it involves IO,
-        // so we execute it in async task
+            // Recognizer initialization is a time-consuming and it involves IO,
+            // so we execute it in async task
 
-        new AsyncTask<Void, Void, Exception>() {
-            @Override
-            protected Exception doInBackground(Void... params) {
-                try {
-                    Assets assets = new Assets(PocketSphinxActivity.this);
-                    File assetDir = assets.syncAssets();
-                    setupRecognizer(assetDir);
-                } catch (IOException e) {
-                    return e;
+            new AsyncTask<Void, Void, Exception>() {
+                @Override
+                protected Exception doInBackground(Void... params) {
+                    try {
+                        Assets assets = new Assets(PocketSphinxActivity.this);
+                        File assetDir = assets.syncAssets();
+                        setupRecognizer(assetDir);
+                    } catch (IOException e) {
+                        return e;
+                    }
+                    return null;
                 }
-                return null;
-            }
 
-            @Override
-            protected void onPostExecute(Exception result) {
-                if (result != null) {
-                    ((TextView) findViewById(R.id.caption_text))
-                            .setText("Failed to init recognizer " + result);
-                } else {
-                    switchSearch(KWS_SEARCH);
+                @Override
+                protected void onPostExecute(Exception result) {
+                    if (result != null) {
+                        ((TextView) findViewById(R.id.caption_text))
+                                .setText("Failed to init recognizer " + result);
+                    } else {
+                        switchSearch(KWS_SEARCH);
+                    }
+                }
+            }.execute();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == MY_PERMISSIONS_REQUEST_RECORD_AUDIO) {
+            if (grantResults.length == 0) {
+                // Permission denied
+                finish();
+            } else {
+                if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                    // Permission denied
+                    finish();
+                } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission granted
+                    // Restart application
+                    Intent intent = new Intent(getApplicationContext(), PocketSphinxActivity.class);
+                    startActivity(intent);
+                    finish();
                 }
             }
-        }.execute();
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        recognizer.cancel();
-        recognizer.shutdown();
+
+        if (recognizer != null) {
+            recognizer.cancel();
+            recognizer.shutdown();
+        }
     }
-    
+
     /**
      * In partial result we get quick updates about current hypothesis. In
      * keyword spotting mode we can react here, in other modes we need to wait
@@ -121,7 +160,7 @@ public class PocketSphinxActivity extends Activity implements
     @Override
     public void onPartialResult(Hypothesis hypothesis) {
         if (hypothesis == null)
-    	    return;
+            return;
 
         String text = hypothesis.getHypstr();
         if (text.equals(KEYPHRASE))
@@ -163,7 +202,7 @@ public class PocketSphinxActivity extends Activity implements
 
     private void switchSearch(String searchName) {
         recognizer.stop();
-        
+
         // If we are not spotting, start listening with timeout (10000 ms or 10 seconds).
         if (searchName.equals(KWS_SEARCH))
             recognizer.startListening(searchName);
@@ -177,20 +216,20 @@ public class PocketSphinxActivity extends Activity implements
     private void setupRecognizer(File assetsDir) throws IOException {
         // The recognizer can be configured to perform multiple searches
         // of different kind and switch between them
-        
+
         recognizer = defaultSetup()
                 .setAcousticModel(new File(assetsDir, "en-us-ptm"))
                 .setDictionary(new File(assetsDir, "cmudict-en-us.dict"))
-                
-                // To disable logging of raw audio comment out this call (takes a lot of space on the device)
+
+                        // To disable logging of raw audio comment out this call (takes a lot of space on the device)
                 .setRawLogDir(assetsDir)
-                
-                // Threshold to tune for keyphrase to balance between false alarms and misses
+
+                        // Threshold to tune for keyphrase to balance between false alarms and misses
                 .setKeywordThreshold(1e-45f)
-                
-                // Use context-independent phonetic search, context-dependent is too slow for mobile
+
+                        // Use context-independent phonetic search, context-dependent is too slow for mobile
                 .setBoolean("-allphone_ci", true)
-                
+
                 .getRecognizer();
         recognizer.addListener(this);
 
@@ -200,7 +239,7 @@ public class PocketSphinxActivity extends Activity implements
 
         // Create keyword-activation search.
         recognizer.addKeyphraseSearch(KWS_SEARCH, KEYPHRASE);
-        
+
         // Create grammar-based search for selection between demos
         File menuGrammar = new File(assetsDir, "menu.gram");
         recognizer.addGrammarSearch(MENU_SEARCH, menuGrammar);
@@ -208,11 +247,11 @@ public class PocketSphinxActivity extends Activity implements
         // Create grammar-based search for digit recognition
         File digitsGrammar = new File(assetsDir, "digits.gram");
         recognizer.addGrammarSearch(DIGITS_SEARCH, digitsGrammar);
-        
+
         // Create language model search
         File languageModel = new File(assetsDir, "weather.dmp");
         recognizer.addNgramSearch(FORECAST_SEARCH, languageModel);
-        
+
         // Phonetic search
         File phoneticModel = new File(assetsDir, "en-phone.dmp");
         recognizer.addAllphoneSearch(PHONE_SEARCH, phoneticModel);
