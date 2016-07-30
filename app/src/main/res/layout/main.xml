@@ -6,7 +6,7 @@
     android:padding="16dp" >
 
     <TextView
-        android:id="@+id/caption_text"
+        android:id="@+id/captionText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -17,7 +17,23 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:gravity="center" >
+        android:gravity="center">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/enter_child_mode"
+            android:id="@+id/childModeButton"
+            android:layout_gravity="bottom"
+            android:enabled="false" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter Adult Mode"
+            android:id="@+id/adultModeButton"
+            android:layout_gravity="bottom"
+            android:enabled="true" />
 
         <TextView
             android:id="@+id/result_text"

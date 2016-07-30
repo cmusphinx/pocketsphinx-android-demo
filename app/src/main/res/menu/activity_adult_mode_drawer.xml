@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/navPresentation"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/presentation" />
+        <item
+            android:id="@+id/navChildMode"
+            android:icon="@drawable/ic_child_care_black_24dp"
+            android:title="@string/child_mode" />
+        <item
+            android:id="@+id/navPair"
+            android:icon="@drawable/ic_bluetooth_black_24dp"
+            android:title="@string/connect_devices" />
+        <item
+            android:id="@+id/navPasscode"
+            android:icon="@drawable/ic_lock_outline_black_24dp"
+            android:title="@string/change_passcode" />
+        <item
+            android:id="@+id/navCategory"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="@string/category" />
+        <item
+            android:id="@+id/navLevel"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="@string/level" />
+        <item
+            android:id="@+id/navHelp"
+            android:icon="@drawable/ic_help_outline_black_24dp"
+            android:title="@string/help" />
+    </group>
+    <!--<item android:title="Communicate">-->
+    <!--<menu>-->
+    <!--<item-->
+    <!--android:id="@+id/nav_share"-->
+    <!--android:icon="@drawable/ic_menu_share"-->
+    <!--android:title="Share" />-->
+    <!--<item-->
+    <!--android:id="@+id/nav_send"-->
+    <!--android:icon="@drawable/ic_menu_send"-->
+    <!--android:title="Send" />-->
+    <!--</menu>-->
+    <!--</item>-->
+</menu>

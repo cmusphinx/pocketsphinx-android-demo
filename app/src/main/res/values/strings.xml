@@ -1,11 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-
-    <string name="app_name">PocketSphinx Demo</string>
-    
+    <string name="app_name">KidID</string>
     <string name="kws_caption">To start demonstration say \"oh mighty computer\".</string>
     <string name="menu_caption">Say \"digits\", \"forecast\" or \"phones\" to choose the grammar, language model or phonetic decoder example.</string>
     <string name="digits_caption">To try recognition of digits: say something like \"one two three four five\".</string>
     <string name="forecast_caption">To try recognition of a weather forecast like \"sunny spells on Wednesday\".</string>
     <string name="phone_caption">To try phonetic recognition say anything.</string>
+
+    <string name="title_activity_child_mode">ChildModeActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="preparing_recognizer">Preparing the speech recognizer</string>
+    <string name="failed_speech">"Failed to start speech recognition: "</string>
+    <string name="started_speech">Started speech recognition</string>
+    <string name="enter_child_mode">Enter Child Mode</string>
+    <string name="title_activity_adult_mode">AdultMode</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="child_mode">Child Mode</string>
+    <string name="connect_devices">Connect Devices</string>
+    <string name="change_passcode">Change Passcode</string>
+    <string name="category">Category</string>
+    <string name="level">Level</string>
+    <string name="help">Help</string>
+    <string name="choose_category">Choose a category to change the illustrations your child will see:</string>
+    <string name="choose_level">Choose a level to change the difficulty of the illustrations:</string>
+    <string name="currently_unavailable">Currently unavailable</string>
+    <string name="presentation">Presentation</string>
+    <string name="in_progress">In progress</string>
 </resources>

@@ -1,0 +1,14 @@
+#JSGF V1.0;
+
+grammar animals;
+
+public <animal> = bear    |
+          dog  |
+          elephant   |
+          giraffe   |
+          horse |
+          kangaroo  |
+          lion  |
+          peacock   |
+          rhino |
+          tiger;
