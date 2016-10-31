@@ -6,7 +6,7 @@
 -feat 1s_c_d_dd
 -svspec 0-12/13-25/26-38
 -agc none
--cmn current
+-cmn batch
 -varnorm no
 -model ptm
 -cmninit 40,10,10
