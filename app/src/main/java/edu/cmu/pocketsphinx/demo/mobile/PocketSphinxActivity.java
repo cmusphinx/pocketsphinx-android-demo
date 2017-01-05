@@ -64,16 +64,16 @@ public class PocketSphinxActivity extends BaseActivity {
 
     @Override
     protected void setErrorText(Exception error) {
-        ((TextView) findViewById(R.id.caption_text)).setText(error.getMessage());
+        ((TextView) findViewById(edu.cmu.pocketsphinx.demo.mobile.R.id.caption_text)).setText(error.getMessage());
     }
 
     @Override
     protected void setPostExecuteText(Exception result) {
-        ((TextView) findViewById(R.id.caption_text)).setText("Failed to init recognizer " + result);
+        ((TextView) findViewById(edu.cmu.pocketsphinx.demo.mobile.R.id.caption_text)).setText("Failed to init recognizer " + result);
     }
 
     @Override
     protected void setSearchText(String caption) {
-        ((TextView) findViewById(R.id.caption_text)).setText(caption);
+        ((TextView) findViewById(edu.cmu.pocketsphinx.demo.mobile.R.id.caption_text)).setText(caption);
     }
 }
