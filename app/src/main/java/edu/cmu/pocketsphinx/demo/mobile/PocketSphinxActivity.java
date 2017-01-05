@@ -28,62 +28,26 @@
  * ====================================================================
  */
 
-package edu.cmu.pocketsphinx.demo;
+package edu.cmu.pocketsphinx.demo.mobile;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
+import edu.cmu.pocketsphinx.demo.BaseActivity;
 
-import edu.cmu.pocketsphinx.Assets;
-import edu.cmu.pocketsphinx.Hypothesis;
-import edu.cmu.pocketsphinx.RecognitionListener;
-import edu.cmu.pocketsphinx.SpeechRecognizer;
-import edu.cmu.pocketsphinx.SpeechRecognizerSetup;
-
-import static android.widget.Toast.makeText;
-
-public class PocketSphinxActivity extends Activity implements
-        RecognitionListener {
-
-    /* Named searches allow to quickly reconfigure the decoder */
-    private static final String KWS_SEARCH = "wakeup";
-    private static final String FORECAST_SEARCH = "forecast";
-    private static final String DIGITS_SEARCH = "digits";
-    private static final String PHONE_SEARCH = "phones";
-    private static final String MENU_SEARCH = "menu";
-
-    /* Keyword we are looking for to activate menu */
-    private static final String KEYPHRASE = "oh mighty computer";
-
-    /* Used to handle permission request */
-    private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
-
-    private SpeechRecognizer recognizer;
-    private HashMap<String, Integer> captions;
+public class PocketSphinxActivity extends BaseActivity {
 
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
 
-        // Prepare the data for UI
-        captions = new HashMap<String, Integer>();
-        captions.put(KWS_SEARCH, R.string.kws_caption);
-        captions.put(MENU_SEARCH, R.string.menu_caption);
-        captions.put(DIGITS_SEARCH, R.string.digits_caption);
-        captions.put(PHONE_SEARCH, R.string.phone_caption);
-        captions.put(FORECAST_SEARCH, R.string.forecast_caption);
-        setContentView(R.layout.main);
-        ((TextView) findViewById(R.id.caption_text))
+        setContentView(edu.cmu.pocketsphinx.demo.R.layout.main);
+        ((TextView) findViewById(edu.cmu.pocketsphinx.demo.R.id.caption_text))
                 .setText("Preparing the recognizer");
 
         // Check if user has given permission to record audio
@@ -114,7 +78,7 @@ public class PocketSphinxActivity extends Activity implements
             @Override
             protected void onPostExecute(Exception result) {
                 if (result != null) {
-                    ((TextView) findViewById(R.id.caption_text))
+                    ((TextView) findViewById(edu.cmu.pocketsphinx.demo.R.id.caption_text))
                             .setText("Failed to init recognizer " + result);
                 } else {
                     switchSearch(KWS_SEARCH);
@@ -167,7 +131,7 @@ public class PocketSphinxActivity extends Activity implements
         else if (text.equals(FORECAST_SEARCH))
             switchSearch(FORECAST_SEARCH);
         else
-            ((TextView) findViewById(R.id.result_text)).setText(text);
+            ((TextView) findViewById(edu.cmu.pocketsphinx.demo.R.id.result_text)).setText(text);
     }
 
     /**
@@ -175,7 +139,7 @@ public class PocketSphinxActivity extends Activity implements
      */
     @Override
     public void onResult(Hypothesis hypothesis) {
-        ((TextView) findViewById(R.id.result_text)).setText("");
+        ((TextView) findViewById(edu.cmu.pocketsphinx.demo.R.id.result_text)).setText("");
         if (hypothesis != null) {
             String text = hypothesis.getHypstr();
             makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
@@ -205,7 +169,7 @@ public class PocketSphinxActivity extends Activity implements
             recognizer.startListening(searchName, 10000);
 
         String caption = getResources().getString(captions.get(searchName));
-        ((TextView) findViewById(R.id.caption_text)).setText(caption);
+        ((TextView) findViewById(edu.cmu.pocketsphinx.demo.R.id.caption_text)).setText(caption);
     }
 
     private void setupRecognizer(File assetsDir) throws IOException {
@@ -247,7 +211,7 @@ public class PocketSphinxActivity extends Activity implements
 
     @Override
     public void onError(Exception error) {
-        ((TextView) findViewById(R.id.caption_text)).setText(error.getMessage());
+        ((TextView) findViewById(edu.cmu.pocketsphinx.demo.R.id.caption_text)).setText(error.getMessage());
     }
 
     @Override

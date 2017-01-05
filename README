@@ -1,6 +1,6 @@
 About
 =====
 
-This is a demonstration for Pocketsphinx on Android
+This fork of pocketsphinx-android-demo extends the existing app by a module for wearables.
+The module aims to demonstrate the Pocketsphinx offline speech recognition as a standalone app on devices running Android Wear 2.0.
 
-See for details http://cmusphinx.sourceforge.net/wiki/tutorialandroid
