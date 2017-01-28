@@ -1,0 +1,17 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "24.0.2"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 24
+        versionCode 1
+        versionName "1.0"
+    }
+}
+
+ant.importBuild 'assets.xml'
+preBuild.dependsOn(list, checksum)
+clean.dependsOn(clean_assets)

@@ -88,7 +88,7 @@ public class PocketSphinxActivity extends Activity implements
 
         // Check if user has given permission to record audio
         int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO);
-        if (permissionCheck == PackageManager.PERMISSION_DENIED) {
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
             return;
         }
