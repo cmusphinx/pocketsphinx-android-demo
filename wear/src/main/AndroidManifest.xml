@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.cmu.pocketsphinx.demo.wear">
 
+    <meta-data
+        android:name="com.google.android.wearable.standalone"
+        android:value="true" />
+    
     <uses-feature android:name="android.hardware.type.watch" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
