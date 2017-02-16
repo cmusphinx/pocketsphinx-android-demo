@@ -16,6 +16,5 @@ android {
 dependencies {
     compile project(':aars')
     compile project(':models')
-    compile 'com.google.android.support:wearable:2.0.0-beta2'
-    compile 'com.google.android.support:wearable:1.4.0'
+    compile 'com.google.android.support:wearable:2.0.0'
 }
