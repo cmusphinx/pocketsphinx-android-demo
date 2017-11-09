@@ -35,6 +35,7 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.widget.TextView;
@@ -42,6 +43,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
 import edu.cmu.pocketsphinx.Assets;
@@ -76,7 +78,7 @@ public class PocketSphinxActivity extends Activity implements
         super.onCreate(state);
 
         // Prepare the data for UI
-        captions = new HashMap<String, Integer>();
+        captions = new HashMap<>();
         captions.put(KWS_SEARCH, R.string.kws_caption);
         captions.put(MENU_SEARCH, R.string.menu_caption);
         captions.put(DIGITS_SEARCH, R.string.digits_caption);
@@ -92,45 +94,48 @@ public class PocketSphinxActivity extends Activity implements
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
             return;
         }
-        runRecognizerSetup();
-    }
-
-    private void runRecognizerSetup() {
         // Recognizer initialization is a time-consuming and it involves IO,
         // so we execute it in async task
-        new AsyncTask<Void, Void, Exception>() {
-            @Override
-            protected Exception doInBackground(Void... params) {
-                try {
-                    Assets assets = new Assets(PocketSphinxActivity.this);
-                    File assetDir = assets.syncAssets();
-                    setupRecognizer(assetDir);
-                } catch (IOException e) {
-                    return e;
-                }
-                return null;
-            }
+        new SetupTask(this).execute();
+    }
 
-            @Override
-            protected void onPostExecute(Exception result) {
-                if (result != null) {
-                    ((TextView) findViewById(R.id.caption_text))
-                            .setText("Failed to init recognizer " + result);
-                } else {
-                    switchSearch(KWS_SEARCH);
-                }
+    private static class SetupTask extends AsyncTask<Void, Void, Exception> {
+        WeakReference<PocketSphinxActivity> activityReference;
+        SetupTask(PocketSphinxActivity activity) {
+            this.activityReference = new WeakReference<>(activity);
+        }
+        @Override
+        protected Exception doInBackground(Void... params) {
+            try {
+                Assets assets = new Assets(activityReference.get());
+                File assetDir = assets.syncAssets();
+                activityReference.get().setupRecognizer(assetDir);
+            } catch (IOException e) {
+                return e;
             }
-        }.execute();
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Exception result) {
+            if (result != null) {
+                ((TextView) activityReference.get().findViewById(R.id.caption_text))
+                        .setText("Failed to init recognizer " + result);
+            } else {
+                activityReference.get().switchSearch(KWS_SEARCH);
+            }
+        }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String[] permissions, int[] grantResults) {
+                                           @NonNull String[] permissions, @NonNull  int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == PERMISSIONS_REQUEST_RECORD_AUDIO) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                runRecognizerSetup();
+                // Recognizer initialization is a time-consuming and it involves IO,
+                // so we execute it in async task
+                new SetupTask(this).execute();
             } else {
                 finish();
             }
@@ -221,8 +226,8 @@ public class PocketSphinxActivity extends Activity implements
                 .getRecognizer();
         recognizer.addListener(this);
 
-        /** In your application you might not need to add all those searches.
-         * They are added here for demonstration. You can leave just one.
+        /* In your application you might not need to add all those searches.
+          They are added here for demonstration. You can leave just one.
          */
 
         // Create keyword-activation search.

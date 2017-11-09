@@ -1,20 +1,18 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
-
+    compileSdkVersion 26
     defaultConfig {
         applicationId "edu.cmu.sphinx.pocketsphinx"
         minSdkVersion 14
-        targetSdkVersion 24
-        versionCode 2
+        targetSdkVersion 26
+        versionCode 1
         versionName "1.1"
     }
 }
 
 dependencies {
-    compile project(':aars')
-    compile project(':models')
-    compile 'com.android.support:appcompat-v7:25.2.0'
+    implementation project(':aars')
+    implementation project(':models')
+    implementation 'com.android.support:appcompat-v7:26.1.0'
 }

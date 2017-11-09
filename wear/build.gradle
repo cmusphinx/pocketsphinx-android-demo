@@ -1,20 +1,19 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "24.0.2"
-
+    compileSdkVersion 26
     defaultConfig {
         applicationId "edu.cmu.pocketsphinx.demo.wear"
         minSdkVersion 24
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
     }
 }
 
 dependencies {
-    compile project(':aars')
-    compile project(':models')
-    compile 'com.google.android.support:wearable:2.0.0'
+    implementation project(':aars')
+    implementation project(':models')
+    implementation 'com.google.android.support:wearable:2.1.0'
+    compileOnly 'com.google.android.wearable:wearable:2.1.0'
 }
